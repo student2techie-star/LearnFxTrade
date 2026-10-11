@@ -11,10 +11,12 @@ import {
   ArrowRight,
   Play,
   BarChart3,
-  Users,
+  Layers,
+  Activity,
   CheckCircle2,
-  DollarSign,
+  Lock,
   ChevronRight,
+  Flame,
 } from 'lucide-react';
 
 export default function HomePage() {
@@ -22,69 +24,86 @@ export default function HomePage() {
   const certificates = db.getCertificates();
 
   return (
-    <div className="space-y-24 pb-24">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden pt-12 md:pt-20 lg:pt-28">
-        {/* Glow ambient lights */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-emerald-500/15 blur-[140px] pointer-events-none rounded-full" />
-        <div className="absolute top-1/3 right-10 w-[400px] h-[300px] bg-cyan-500/10 blur-[120px] pointer-events-none rounded-full" />
+    <div className="space-y-28 pb-28 bg-[#06090e] bg-grid-pattern relative">
+      {/* Hero Glows */}
+      <div className="absolute top-12 left-1/2 -translate-x-1/2 w-[650px] h-[400px] bg-[#00f2a9]/10 blur-[150px] pointer-events-none rounded-full" />
+      <div className="absolute top-36 right-4 w-[500px] h-[350px] bg-cyan-500/10 blur-[140px] pointer-events-none rounded-full" />
 
+      {/* Hero Section */}
+      <section className="relative pt-12 md:pt-20 lg:pt-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative">
           <div className="flex flex-col items-center text-center space-y-8 max-w-4xl mx-auto">
-            {/* Pill Tag */}
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 backdrop-blur-md shadow-lg shadow-emerald-500/10">
-              <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-xs font-semibold text-emerald-400 tracking-wide uppercase">
-                Real Payouts • Institutional Smart Money Concepts • 100% Honest
+            {/* Live Terminal Badge */}
+            <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-[#00f2a9]/40 bg-[#00f2a9]/10 backdrop-blur-xl shadow-lg shadow-[#00f2a9]/10">
+              <span className="flex h-2 w-2 rounded-full bg-[#00f2a9] animate-ping" />
+              <span className="text-[11px] font-mono font-bold text-[#00f2a9] tracking-wider uppercase">
+                INSTITUTIONAL ORDER FLOW • SMC & NIFTY PRECISION
               </span>
             </div>
 
-            {/* Main Title */}
-            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-white leading-[1.1]">
-              Stop Trading Retail Traps. <br />
-              <span className="gradient-text">Trade Like Institutions & Prop Firms.</span>
+            {/* Main Punchy Title */}
+            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-white leading-[1.08]">
+              Trade Like The Banks. <br />
+              <span className="text-gradient-emerald">Extract Consistent Prop Payouts.</span>
             </h1>
 
             {/* Subtitle */}
-            <p className="text-base sm:text-xl text-slate-300 max-w-2xl leading-relaxed">
-              Master Institutional Forex Order Flow, Gold (XAU/USD) Intraday Scalping, and Indian Index (Nifty/BankNifty) Option Buying. Backed by verified funded prop firm payout certificates.
+            <p className="text-base sm:text-lg text-slate-300 max-w-2xl leading-relaxed">
+              Master Institutional Liquidity Grabs, Fair Value Gaps, and Indian Index (Nifty/BankNifty) Option Buying. Backed by verified funded account payout receipts and zero retail indicator noise.
             </p>
 
-            {/* Action Buttons */}
+            {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
               <Link
                 href="/courses"
-                className="w-full sm:w-auto px-8 py-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-sm tracking-wide transition-all shadow-xl shadow-emerald-500/25 flex items-center justify-center gap-2 group active:scale-95"
+                className="w-full sm:w-auto px-8 py-4 rounded-xl bg-[#00f2a9] hover:bg-[#00d696] text-[#06090e] font-black text-xs uppercase tracking-widest transition-all shadow-xl shadow-[#00f2a9]/30 flex items-center justify-center gap-2.5 group active:scale-95"
               >
-                <span>Explore Courses & Syllabuses</span>
+                <span>Browse All Masterclasses</span>
                 <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link
                 href="/certificates"
-                className="w-full sm:w-auto px-8 py-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm border border-slate-700/80 transition-all flex items-center justify-center gap-2 shadow-lg active:scale-95"
+                className="w-full sm:w-auto px-8 py-4 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-widest border border-[#172235] transition-all flex items-center justify-center gap-2 shadow-lg active:scale-95"
               >
                 <Award className="h-4 w-4 text-amber-400" />
-                <span>View Payout Certificates Proof</span>
+                <span>Inspect Payout Proofs</span>
               </Link>
             </div>
 
-            {/* Trust Metrics Bar */}
-            <div className="pt-8 grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-12 w-full border-t border-slate-800/80 mt-6">
-              <div>
-                <div className="text-2xl sm:text-3xl font-black text-white">$65,000+</div>
-                <div className="text-xs text-slate-400 mt-0.5">Prop Firm Payouts Verified</div>
-              </div>
-              <div>
-                <div className="text-2xl sm:text-3xl font-black text-emerald-400">1:3.5+</div>
-                <div className="text-xs text-slate-400 mt-0.5">Average Risk-to-Reward</div>
-              </div>
-              <div>
-                <div className="text-2xl sm:text-3xl font-black text-cyan-400">1,200+</div>
-                <div className="text-xs text-slate-400 mt-0.5">Active Students Trained</div>
-              </div>
-              <div>
-                <div className="text-2xl sm:text-3xl font-black text-amber-400">₹0 Hidden</div>
-                <div className="text-xs text-slate-400 mt-0.5">One-Time Fee & Lifetime Access</div>
+            {/* Bloomberg Style Terminal Metrics Board */}
+            <div className="w-full pt-8 mt-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-5 rounded-2xl border border-[#172235] bg-[#090f18]/90 backdrop-blur-xl">
+                <div className="text-left border-r border-[#172235]/80 pr-4">
+                  <div className="text-[10px] font-mono uppercase text-slate-400 flex items-center gap-1">
+                    <Activity className="h-3 w-3 text-[#00f2a9]" /> Verified Payouts
+                  </div>
+                  <div className="text-2xl sm:text-3xl font-black text-white mt-1">$65,000+</div>
+                  <div className="text-[10px] text-[#00f2a9] font-mono">FTMO & FundedNext</div>
+                </div>
+
+                <div className="text-left border-r border-[#172235]/80 pr-4">
+                  <div className="text-[10px] font-mono uppercase text-slate-400 flex items-center gap-1">
+                    <TrendingUp className="h-3 w-3 text-cyan-400" /> Win Expectancy
+                  </div>
+                  <div className="text-2xl sm:text-3xl font-black text-cyan-400 mt-1">1:3.5+</div>
+                  <div className="text-[10px] text-slate-400 font-mono">Average R:R Ratio</div>
+                </div>
+
+                <div className="text-left border-r border-[#172235]/80 pr-4">
+                  <div className="text-[10px] font-mono uppercase text-slate-400 flex items-center gap-1">
+                    <Flame className="h-3 w-3 text-amber-400" /> Active Students
+                  </div>
+                  <div className="text-2xl sm:text-3xl font-black text-amber-400 mt-1">1,240+</div>
+                  <div className="text-[10px] text-slate-400 font-mono">India & Global</div>
+                </div>
+
+                <div className="text-left">
+                  <div className="text-[10px] font-mono uppercase text-slate-400 flex items-center gap-1">
+                    <ShieldCheck className="h-3 w-3 text-emerald-400" /> Fee Model
+                  </div>
+                  <div className="text-2xl sm:text-3xl font-black text-white mt-1">1-Time</div>
+                  <div className="text-[10px] text-emerald-400 font-mono">Lifetime Video Access</div>
+                </div>
               </div>
             </div>
           </div>
@@ -95,21 +114,21 @@ export default function HomePage() {
       <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
           <div>
-            <span className="text-xs font-bold uppercase tracking-widest text-emerald-400">
-              Curated Curriculum
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-black text-white mt-1">
-              Popular Trading Masterclasses
+            <div className="inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase tracking-widest text-[#00f2a9]">
+              <Layers className="h-3.5 w-3.5" /> High-Probability Syllabuses
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-black text-white mt-1.5">
+              Institutional Masterclasses
             </h2>
             <p className="text-sm text-slate-400 mt-1 max-w-xl">
-              From prop firm evaluation passing algorithms to Indian market option buying. Each course includes free video previews.
+              Equip yourself with institutional order blocks, liquidity sweeps, and options data interpretation.
             </p>
           </div>
           <Link
             href="/courses"
-            className="flex items-center gap-1.5 text-sm font-bold text-emerald-400 hover:text-emerald-300 group"
+            className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#00f2a9] hover:underline group"
           >
-            <span>View All Courses</span>
+            <span>Explore All Syllabuses</span>
             <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
@@ -121,90 +140,92 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Social Proof: Payout Certificates Preview */}
+      {/* Verified Payout Proofs Showcase */}
       <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="rounded-3xl border border-slate-800 bg-gradient-to-b from-slate-900/80 to-slate-950 p-6 sm:p-12 space-y-10">
+        <div className="rounded-3xl border border-[#172235] bg-gradient-to-b from-[#090f18] via-[#060a10] to-[#06090e] p-6 sm:p-12 space-y-10 shadow-2xl relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/5 blur-[120px] pointer-events-none" />
+
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold">
-                <Award className="h-3.5 w-3.5" /> 100% Real Payout Certificates
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/25 text-amber-400 text-xs font-mono font-bold uppercase">
+                <Award className="h-3.5 w-3.5" /> Verifiable Trading Proofs
               </div>
               <h2 className="text-3xl sm:text-4xl font-black text-white mt-2">
-                Proven Social Proof & Payout Receipts
+                Real Payout Certificates & Statements
               </h2>
               <p className="text-sm text-slate-400 mt-1 max-w-xl">
-                We believe in complete transparency. Inspect real payout statements and prop firm pass certificates before you enroll.
+                We believe in extreme transparency. Click any payout certificate below to open the high-resolution lightbox with reference keys.
               </p>
             </div>
             <Link
               href="/certificates"
-              className="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs border border-slate-700 transition flex items-center gap-2 self-start md:self-auto"
+              className="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-wider border border-[#172235] transition flex items-center gap-2 self-start md:self-auto"
             >
-              <span>View Full Gallery (LightBox)</span>
+              <span>View Full Lightbox Gallery</span>
               <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </div>
 
           <CertificateGrid certificates={certificates} limit={3} />
 
-          <div className="rounded-xl bg-slate-950/60 border border-slate-800/80 p-4 text-center text-xs text-slate-400">
-            Note: All certificates shown are from live and funded trading accounts. Payouts reflect personal historical performance and are not a promise of future yields.
+          <div className="rounded-xl bg-[#06090e] border border-[#172235] p-4 text-center text-xs font-mono text-slate-400">
+            Note: All certificates shown are from live and funded trading accounts. Payouts reflect personal historical performance and are not a guarantee of future returns.
           </div>
         </div>
       </section>
 
-      {/* Why Choose LearnFxTrade */}
+      {/* The Edge / Pillar Cards */}
       <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-2xl mx-auto mb-14">
-          <span className="text-xs font-bold uppercase tracking-widest text-emerald-400">
-            The Edge You Need
+        <div className="text-center max-w-2xl mx-auto mb-14 space-y-2">
+          <span className="text-xs font-mono font-bold uppercase tracking-widest text-[#00f2a9]">
+            The Institutional Advantage
           </span>
-          <h2 className="text-3xl sm:text-4xl font-black text-white mt-1">
-            Built by Traders, for Serious Traders
+          <h2 className="text-3xl sm:text-4xl font-black text-white">
+            Built for Serious Disciplined Traders
           </h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="p-8 rounded-2xl border border-slate-800 bg-slate-900/40 hover:border-emerald-500/40 transition-colors space-y-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+          <div className="p-8 rounded-2xl border border-[#172235] bg-[#090f18]/60 hover:border-[#00f2a9]/50 transition-all space-y-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#00f2a9]/10 text-[#00f2a9] border border-[#00f2a9]/30">
               <BarChart3 className="h-6 w-6" />
             </div>
             <h3 className="text-xl font-bold text-white">Smart Money Concepts (SMC)</h3>
-            <p className="text-sm text-slate-400 leading-relaxed">
-              Learn institutional order blocks, liquidity sweeps, fair value gaps (FVG), and liquidity pools that drive price before news hits.
+            <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+              Identify institutional order flow, liquidity pools, fair value gaps, and liquidity sweeps before retail breakout traders get trapped.
             </p>
           </div>
 
-          <div className="p-8 rounded-2xl border border-slate-800 bg-slate-900/40 hover:border-emerald-500/40 transition-colors space-y-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+          <div className="p-8 rounded-2xl border border-[#172235] bg-[#090f18]/60 hover:border-cyan-500/50 transition-all space-y-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">
               <ShieldCheck className="h-6 w-6" />
             </div>
             <h3 className="text-xl font-bold text-white">Razorpay Secure Checkout</h3>
-            <p className="text-sm text-slate-400 leading-relaxed">
-              Instant access via UPI, Cards, and NetBanking. Backed by bank-grade encryption, instant signature verification, and automated receipts.
+            <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+              Immediate enrollment via UPI (GPay/PhonePe), Credit/Debit cards, and NetBanking with HMAC-SHA256 signature verification.
             </p>
           </div>
 
-          <div className="p-8 rounded-2xl border border-slate-800 bg-slate-900/40 hover:border-emerald-500/40 transition-colors space-y-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
+          <div className="p-8 rounded-2xl border border-[#172235] bg-[#090f18]/60 hover:border-amber-500/50 transition-all space-y-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/30">
               <Zap className="h-6 w-6" />
             </div>
             <h3 className="text-xl font-bold text-white">Prop Firm Funding Strategy</h3>
-            <p className="text-sm text-slate-400 leading-relaxed">
-              Step-by-step algorithms designed to pass Phase 1 & 2 on FTMO, FundedNext, and earn consistent bi-weekly payouts without emotional tilt.
+            <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+              Step-by-step risk management protocols to pass Phase 1 & 2 on FTMO, FundedNext, and secure recurring profit share splits.
             </p>
           </div>
         </div>
       </section>
 
-      {/* Call to action */}
+      {/* Bottom CTA */}
       <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-950/60 via-slate-900 to-slate-950 border border-emerald-500/30 p-8 sm:p-16 text-center space-y-6">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-500 text-slate-950 shadow-xl shadow-emerald-500/30">
-            <TrendingUp className="h-7 w-7 stroke-[2.5]" />
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#09151e] via-[#090f18] to-[#06090e] border border-[#00f2a9]/30 p-8 sm:p-16 text-center space-y-6">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#00f2a9] text-[#06090e] shadow-xl shadow-[#00f2a9]/30">
+            <TrendingUp className="h-7 w-7 stroke-[3]" />
           </div>
           <h2 className="text-3xl sm:text-5xl font-black text-white max-w-2xl mx-auto">
-            Ready to Transform Your Trading Journey?
+            Ready to Trade with Real Edge?
           </h2>
           <p className="text-sm sm:text-base text-slate-300 max-w-xl mx-auto leading-relaxed">
             Gain immediate access to full course videos, exclusive trade execution checklists, and free preview lessons today.
@@ -212,7 +233,7 @@ export default function HomePage() {
           <div className="pt-2">
             <Link
               href="/courses"
-              className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-sm tracking-wide shadow-xl shadow-emerald-500/25 transition active:scale-95"
+              className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-[#00f2a9] hover:bg-[#00d696] text-[#06090e] font-black text-xs uppercase tracking-widest shadow-xl shadow-[#00f2a9]/30 transition active:scale-95"
             >
               Start Learning Now <ArrowRight className="h-4 w-4" />
             </Link>

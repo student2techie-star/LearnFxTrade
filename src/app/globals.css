@@ -2,85 +2,131 @@
 
 @layer base {
   :root {
-    --background: #090d16;
-    --foreground: #f1f5f9;
-    --card: #0f172a;
-    --card-foreground: #f8fafc;
-    --primary: #10b981;
-    --primary-hover: #059669;
-    --accent: #3b82f6;
-    --border: #1e293b;
-    --muted: #64748b;
+    --background: #06090e;
+    --foreground: #f8fafc;
+    --card: #0c121d;
+    --card-foreground: #f1f5f9;
+    --primary: #00f2a9;
+    --primary-glow: rgba(0, 242, 169, 0.35);
+    --cyan-glow: rgba(56, 189, 248, 0.3);
+    --border: #172235;
     --gold: #f59e0b;
   }
 
   body {
     background-color: var(--background);
     color: var(--foreground);
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', Roboto, sans-serif;
     overflow-x: hidden;
+    letter-spacing: -0.01em;
   }
 }
 
-/* Glassmorphism and Trading Glows */
-.glass-panel {
-  background: rgba(15, 23, 42, 0.75);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+/* Institutional Grid Background */
+.bg-grid-pattern {
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 38px 38px;
+}
+
+.bg-dots-pattern {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Bloomberg / TradingView Glassmorphism */
+.fintech-glass {
+  background: linear-gradient(135deg, rgba(16, 25, 41, 0.75) 0%, rgba(9, 14, 23, 0.85) 100%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.glass-card {
-  background: linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.8) 100%);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+.fintech-card {
+  background: linear-gradient(180deg, rgba(14, 22, 36, 0.8) 0%, rgba(8, 13, 22, 0.95) 100%);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(34, 50, 78, 0.6);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
 }
 
-.glow-emerald {
-  box-shadow: 0 0 35px -5px rgba(16, 185, 129, 0.25);
+.fintech-card:hover {
+  border-color: rgba(0, 242, 169, 0.4);
+  box-shadow: 0 15px 35px -5px rgba(0, 242, 169, 0.12);
 }
 
-.glow-blue {
-  box-shadow: 0 0 35px -5px rgba(59, 130, 246, 0.25);
+/* Radiant Glow Utilities */
+.glow-neon-emerald {
+  box-shadow: 0 0 35px -5px var(--primary-glow);
 }
 
-.gradient-text {
-  background: linear-gradient(135deg, #34d399 0%, #38bdf8 50%, #818cf8 100%);
+.glow-neon-cyan {
+  box-shadow: 0 0 35px -5px var(--cyan-glow);
+}
+
+.text-gradient-emerald {
+  background: linear-gradient(135deg, #00f2a9 0%, #38bdf8 60%, #818cf8 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-.gradient-gold-text {
+.text-gradient-gold {
   background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-/* Moving watermark animation */
+/* Candlestick & Pulse Animations */
+@keyframes tickerSlide {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-ticker {
+  display: flex;
+  width: max-content;
+  animation: tickerSlide 35s linear infinite;
+}
+
+.animate-ticker:hover {
+  animation-play-state: paused;
+}
+
+/* Subtle dynamic pulse */
+@keyframes pulseSubtle {
+  0%, 100% { opacity: 0.8; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.03); }
+}
+
+.animate-pulse-subtle {
+  animation: pulseSubtle 3s ease-in-out infinite;
+}
+
+/* Watermark Float */
 @keyframes floatWatermark {
-  0% { transform: translate(15%, 20%); opacity: 0.25; }
-  25% { transform: translate(70%, 35%); opacity: 0.35; }
-  50% { transform: translate(50%, 75%); opacity: 0.22; }
-  75% { transform: translate(25%, 60%); opacity: 0.32; }
-  100% { transform: translate(15%, 20%); opacity: 0.25; }
+  0% { transform: translate(10%, 15%); opacity: 0.22; }
+  25% { transform: translate(75%, 25%); opacity: 0.35; }
+  50% { transform: translate(50%, 80%); opacity: 0.20; }
+  75% { transform: translate(20%, 65%); opacity: 0.30; }
+  100% { transform: translate(10%, 15%); opacity: 0.22; }
 }
 
 .animate-watermark {
-  animation: floatWatermark 18s ease-in-out infinite;
+  animation: floatWatermark 20s ease-in-out infinite;
 }
 
-/* Custom scrollbars */
+/* Custom Bloomberg Scrollbars */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #090d16;
+  background: #06090e;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1e293b;
-  border-radius: 4px;
+  background: #172235;
+  border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+  background: #00f2a9;
 }
