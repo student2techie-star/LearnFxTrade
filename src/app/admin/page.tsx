@@ -747,41 +747,60 @@ export default function AdminPage() {
                       <tr>
                         <th className="py-3 px-3">Student</th>
                         <th className="py-3 px-3">Email</th>
-                        {courses.map((c) => (
-                          <th key={c.id} className="py-3 px-3 whitespace-nowrap">
-                            {c.title}
-                          </th>
-                        ))}
+                        <th className="py-3 px-3">1. Forex SMC Mastery</th>
+                        <th className="py-3 px-3">2. Nifty & BankNifty Pro</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[#222222]">
-                      {students.map((student) => (
-                        <tr key={student.id} className="hover:bg-[#181818]">
-                          <td className="py-3 px-3 font-bold text-white whitespace-nowrap">{student.name}</td>
-                          <td className="py-3 px-3 font-mono text-[#a1a1aa] whitespace-nowrap">{student.email}</td>
-                          {courses.map((course) => {
-                            const hasAccess = student.enrolledCourses?.some(
-                              (c) => c.courseId === course.id || c.courseId === course.slug
-                            );
+                      {students.map((student) => {
+                        const hasForex = student.enrolledCourses?.some(
+                          (c) =>
+                            c.courseId === 'course-forex-mastery' ||
+                            c.courseId === 'forex-smart-money-concepts-mastery'
+                        );
+                        const hasNifty = student.enrolledCourses?.some(
+                          (c) =>
+                            c.courseId === 'course-nifty-banknifty' ||
+                            c.courseId === 'indian-market-options-price-action-pro'
+                        );
 
-                            return (
-                              <td key={course.id} className="py-3 px-3 whitespace-nowrap">
-                                <button
-                                  onClick={() => handleToggleAccess(student.id, course.id, !!hasAccess)}
-                                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer flex items-center gap-1.5 ${
-                                    hasAccess
-                                      ? 'bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/40 hover:bg-rose-500/20 hover:text-rose-400 hover:border-rose-500/40'
-                                      : 'bg-black text-[#a1a1aa] border border-[#222222] hover:text-white hover:border-[#444444]'
-                                  }`}
-                                  title={hasAccess ? 'Click to revoke access' : 'Click to grant access'}
-                                >
-                                  {hasAccess ? 'Access Granted ✓' : '+ Grant Access'}
-                                </button>
-                              </td>
-                            );
-                          })}
-                        </tr>
-                      ))}
+                        return (
+                          <tr key={student.id} className="hover:bg-[#181818]">
+                            <td className="py-3.5 px-3 font-bold text-white whitespace-nowrap">{student.name}</td>
+                            <td className="py-3.5 px-3 font-mono text-[#a1a1aa] whitespace-nowrap">{student.email}</td>
+                            <td className="py-3.5 px-3 whitespace-nowrap">
+                              <button
+                                onClick={() =>
+                                  handleToggleAccess(student.id, 'course-forex-mastery', !!hasForex)
+                                }
+                                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer flex items-center gap-1.5 ${
+                                  hasForex
+                                    ? 'bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/40 hover:bg-rose-500/20 hover:text-rose-400 hover:border-rose-500/40'
+                                    : 'bg-black text-[#a1a1aa] border border-[#222222] hover:text-white hover:border-[#444444]'
+                                }`}
+                                title={hasForex ? 'Click to revoke Forex SMC access' : 'Click to grant Forex SMC access'}
+                              >
+                                {hasForex ? 'Forex Granted ✓' : '+ Grant Forex SMC'}
+                              </button>
+                            </td>
+                            <td className="py-3.5 px-3 whitespace-nowrap">
+                              <button
+                                onClick={() =>
+                                  handleToggleAccess(student.id, 'course-nifty-banknifty', !!hasNifty)
+                                }
+                                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer flex items-center gap-1.5 ${
+                                  hasNifty
+                                    ? 'bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/40 hover:bg-rose-500/20 hover:text-rose-400 hover:border-rose-500/40'
+                                    : 'bg-black text-[#a1a1aa] border border-[#222222] hover:text-white hover:border-[#444444]'
+                                }`}
+                                title={hasNifty ? 'Click to revoke Nifty Pro access' : 'Click to grant Nifty Pro access'}
+                              >
+                                {hasNifty ? 'Nifty Granted ✓' : '+ Grant Nifty Pro'}
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
