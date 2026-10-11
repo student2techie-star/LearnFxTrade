@@ -33,7 +33,38 @@ const INITIAL_OFFLINE_BATCHES: OfflineBatch[] = [
     notes: 'Live market execution during Indian market trading hours with mentor on large screens.',
     enrolledStudents: ['Vikram Singh', 'Pooja Iyer'],
   },
+  {
+    id: 'batch-del-03',
+    title: 'Delhi Prop Firm Funded Trader Accelerator Masterclass',
+    city: 'Delhi NCR',
+    venue: 'Aerocity Worldmark Executive Tower, New Delhi',
+    startDate: 'Dec 18, 2026',
+    endDate: 'Dec 20, 2026',
+    timing: '10:00 AM - 6:00 PM IST',
+    priceInr: 15499,
+    totalSeats: 20,
+    bookedSeats: 14,
+    status: 'upcoming',
+    notes: 'Master FTMO & FundedNext evaluation challenge passing models with live New York session scalping.',
+    enrolledStudents: ['Aman Verma', 'Simran Kaur', 'Deepak Rawat'],
+  },
+  {
+    id: 'batch-hyd-04',
+    title: 'Hyderabad Elite Option Scalping & Algo Order Flow Lab',
+    city: 'Hyderabad',
+    venue: 'Hitec City Cyber Towers Convention Suite',
+    startDate: 'Jan 08, 2027',
+    endDate: 'Jan 10, 2027',
+    timing: '9:15 AM - 4:30 PM IST',
+    priceInr: 13999,
+    totalSeats: 25,
+    bookedSeats: 11,
+    status: 'upcoming',
+    notes: 'Focus on expiry day momentum bursts, open interest traps, and strict capital allocation.',
+    enrolledStudents: ['Suresh Reddy', 'Naveen Kumar'],
+  },
 ];
+
 
 // Persistent local storage simulator for server routes and client side
 class DataStore {
