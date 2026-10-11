@@ -28,16 +28,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="theme-light">
+    <html lang="en" className="dark theme-dark">
       <head>
         <Script
           src="https://checkout.razorpay.com/v1/checkout.js"
           strategy="lazyOnload"
         />
       </head>
-      <body className="min-h-screen bg-white text-[#131722] antialiased flex flex-col selection:bg-[#2962ff] selection:text-white">
+      <body className="min-h-screen bg-[#131722] text-[#d1d4dc] antialiased flex flex-col selection:bg-[#2962ff] selection:text-white">
         <AuthProvider>
-          <Suspense fallback={<div className="h-20 bg-white border-b border-[#e0e3eb]" />}>
+          <Suspense fallback={<div className="h-20 bg-[#131722] border-b border-[#2a2e39]" />}>
             <Navbar />
           </Suspense>
           <main className="flex-1">

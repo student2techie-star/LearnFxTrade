@@ -19,12 +19,12 @@ const TICKER_ITEMS = [
 
 export default function MarketTicker() {
   return (
-    <div className="w-full bg-[#f8f9fd] border-b border-[#e0e3eb] py-1.5 overflow-hidden select-none">
+    <div className="w-full bg-[#0d1017] border-b border-[#2a2e39] py-1.5 overflow-hidden select-none">
       <div className="animate-ticker flex items-center gap-7 text-[11px] font-mono">
         {[...TICKER_ITEMS, ...TICKER_ITEMS].map((item, idx) => (
           <div key={idx} className="flex items-center gap-2 shrink-0">
-            <span className="font-bold text-[#131722]">{item.symbol}</span>
-            <span className="text-[#131722] font-medium">{item.price}</span>
+            <span className="font-bold text-white">{item.symbol}</span>
+            <span className="text-[#d1d4dc] font-medium">{item.price}</span>
             <span
               className={`flex items-center gap-0.5 font-bold ${
                 item.up ? 'text-[#089981]' : 'text-[#f23645]'
@@ -37,7 +37,7 @@ export default function MarketTicker() {
               )}
               {item.change}
             </span>
-            <span className="text-[#d1d4dc] ml-1.5">•</span>
+            <span className="text-[#363a45] ml-1.5">•</span>
           </div>
         ))}
       </div>

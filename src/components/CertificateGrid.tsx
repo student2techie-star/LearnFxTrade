@@ -21,20 +21,20 @@ export default function CertificateGrid({ certificates, limit }: Props) {
           <div
             key={cert.id}
             onClick={() => setSelectedCert(cert)}
-            className="tv-card-clean group relative cursor-pointer overflow-hidden"
+            className="tv-dark-card group relative cursor-pointer overflow-hidden"
           >
             {/* Image Preview */}
-            <div className="relative aspect-[16/10] w-full overflow-hidden bg-[#f0f3fa]">
+            <div className="relative aspect-[16/10] w-full overflow-hidden bg-[#131722]">
               <img
                 src={cert.imageUrl}
                 alt={cert.title}
                 className="h-full w-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-80" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#1e222d] via-transparent to-transparent opacity-90" />
 
               {/* Tag */}
               <div className="absolute top-3 left-3">
-                <span className="inline-flex items-center gap-1 rounded-full bg-white/95 px-2.5 py-0.5 text-[10px] font-semibold text-[#089981] shadow-xs">
+                <span className="inline-flex items-center gap-1 rounded-full bg-[#131722]/90 border border-[#2a2e39] px-2.5 py-0.5 text-[10px] font-semibold text-[#089981] shadow-xs">
                   <ShieldCheck className="h-3 w-3" />
                   {cert.accountType}
                 </span>
@@ -48,8 +48,8 @@ export default function CertificateGrid({ certificates, limit }: Props) {
               </div>
 
               {/* Hover overlay hint */}
-              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 backdrop-blur-[2px]">
-                <span className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-white text-[#131722] text-xs font-bold shadow-lg">
+              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/60 backdrop-blur-[2px]">
+                <span className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#2962ff] text-white text-xs font-bold shadow-lg">
                   <ZoomIn className="h-4 w-4" /> Inspect Proof
                 </span>
               </div>
@@ -57,19 +57,19 @@ export default function CertificateGrid({ certificates, limit }: Props) {
 
             {/* Info details */}
             <div className="p-4 space-y-2">
-              <h4 className="text-base font-bold text-[#131722] group-hover:text-[#2962ff] transition-colors line-clamp-1">
+              <h4 className="text-base font-bold text-white group-hover:text-[#2962ff] transition-colors line-clamp-1">
                 {cert.title}
               </h4>
               <div className="flex items-center justify-between text-xs text-[#787b86]">
-                <span className="font-semibold text-[#131722] truncate">
+                <span className="font-semibold text-[#d1d4dc] truncate">
                   {cert.firmOrBroker}
                 </span>
-                <span className="font-mono text-[11px] shrink-0">
+                <span className="font-mono text-[11px] shrink-0 text-[#787b86]">
                   {cert.date}
                 </span>
               </div>
               {cert.verifiedRef && (
-                <div className="text-[11px] font-mono text-[#089981] pt-2 border-t border-[#e0e3eb] flex items-center justify-between">
+                <div className="text-[11px] font-mono text-[#089981] pt-2 border-t border-[#2a2e39] flex items-center justify-between">
                   <span>Ref: {cert.verifiedRef}</span>
                   <span className="text-[10px] text-[#787b86] font-sans font-semibold">Verified</span>
                 </div>
@@ -82,36 +82,36 @@ export default function CertificateGrid({ certificates, limit }: Props) {
       {/* Lightbox Modal */}
       {selectedCert && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-md"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 backdrop-blur-md"
           onClick={() => setSelectedCert(null)}
         >
           <div
-            className="relative max-w-4xl w-full rounded-2xl bg-white p-6 shadow-2xl space-y-4"
+            className="relative max-w-4xl w-full rounded-2xl bg-[#1e222d] border border-[#2a2e39] p-6 shadow-2xl space-y-4"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close Button */}
             <button
               onClick={() => setSelectedCert(null)}
-              className="absolute top-4 right-4 p-2 text-[#787b86] hover:text-[#131722] rounded-full bg-[#f0f3fa] hover:bg-[#e0e3eb] transition"
+              className="absolute top-4 right-4 p-2 text-[#787b86] hover:text-white rounded-full bg-[#2a2e39] hover:bg-[#363a45] transition"
             >
               <X className="h-4 w-4" />
             </button>
 
             {/* Header */}
             <div>
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#e8eefd] text-[#2962ff]">
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#2962ff]/15 text-[#2962ff] border border-[#2962ff]/30">
                 {selectedCert.accountType}
               </span>
-              <h3 className="text-xl font-bold text-[#131722] mt-1.5">
+              <h3 className="text-xl font-bold text-white mt-2">
                 {selectedCert.title}
               </h3>
-              <p className="text-xs text-[#787b86]">
-                Issued by: <strong className="text-[#131722]">{selectedCert.firmOrBroker}</strong> on {selectedCert.date}
+              <p className="text-xs text-[#787b86] mt-1">
+                Issued by: <strong className="text-white">{selectedCert.firmOrBroker}</strong> on {selectedCert.date}
               </p>
             </div>
 
             {/* Image */}
-            <div className="relative max-h-[60vh] w-full overflow-hidden rounded-xl bg-[#f0f3fa] border border-[#e0e3eb] flex items-center justify-center">
+            <div className="relative max-h-[60vh] w-full overflow-hidden rounded-xl bg-[#131722] border border-[#2a2e39] flex items-center justify-center">
               <img
                 src={selectedCert.imageUrl}
                 alt={selectedCert.title}
@@ -120,8 +120,8 @@ export default function CertificateGrid({ certificates, limit }: Props) {
             </div>
 
             {/* Footer */}
-            <div className="flex items-center justify-between pt-2 border-t border-[#e0e3eb] text-xs text-[#787b86]">
-              <span className="font-mono text-base font-bold text-[#2962ff]">
+            <div className="flex items-center justify-between pt-2 border-t border-[#2a2e39] text-xs text-[#787b86]">
+              <span className="font-mono text-base font-bold text-[#089981]">
                 Payout: {selectedCert.amount}
               </span>
               <button

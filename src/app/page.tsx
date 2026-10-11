@@ -7,12 +7,9 @@ import {
   ArrowRight,
   ShieldCheck,
   Award,
-  Search,
   TrendingUp,
   BarChart2,
-  CheckCircle2,
-  Globe,
-  SlidersHorizontal,
+  Activity,
   Zap,
 } from 'lucide-react';
 
@@ -21,18 +18,18 @@ export default function HomePage() {
   const certificates = db.getCertificates();
 
   return (
-    <div className="space-y-20 pb-24 bg-white text-[#131722]">
-      {/* TradingView India Hero Section */}
-      <section className="pt-14 sm:pt-20 border-b border-[#e0e3eb] pb-20 bg-gradient-to-b from-[#f8f9fd] to-white">
+    <div className="space-y-20 pb-24 bg-[#131722] text-[#d1d4dc]">
+      {/* TradingView India Dark Hero Section */}
+      <section className="pt-14 sm:pt-20 border-b border-[#2a2e39] pb-20 bg-gradient-to-b from-[#181d2a] to-[#131722]">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 text-center space-y-6">
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#e8eefd] text-[#2962ff] text-xs font-semibold">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#1e222d] border border-[#2a2e39] text-[#2962ff] text-xs font-semibold">
             <span className="flex h-2 w-2 rounded-full bg-[#2962ff] animate-pulse" />
-            <span>TradingView Powered Smart Money & Indian Market Academy</span>
+            <span className="text-[#d1d4dc]">TradingView India Style • Smart Money Concepts & Nifty</span>
           </div>
 
-          {/* Main Title inspired by TradingView India */}
-          <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-[#131722] leading-[1.12]">
+          {/* Main Title */}
+          <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-white leading-[1.12]">
             Where India Charts, Learns & <br className="hidden sm:inline" />
             <span className="text-[#2962ff]">Trades With True Edge.</span>
           </h1>
@@ -55,17 +52,17 @@ export default function HomePage() {
               href="/certificates"
               className="tv-btn-secondary w-full sm:w-auto px-8 py-3.5 text-sm font-semibold flex items-center justify-center gap-2"
             >
-              <Award className="h-4 w-4 text-amber-500" />
+              <Award className="h-4 w-4 text-amber-400" />
               <span>Inspect Payout Proofs</span>
             </Link>
           </div>
 
-          {/* Market Chips (TradingView Style Quick Tabs) */}
+          {/* TradingView Style Market Chips */}
           <div className="pt-8 flex flex-wrap items-center justify-center gap-2 max-w-3xl mx-auto">
             {['Nifty 50 Options', 'BankNifty Scalping', 'Forex EUR/USD SMC', 'Gold XAU/USD', 'FTMO Prop Passed', 'FundedNext Payouts'].map((chip, idx) => (
               <span
                 key={idx}
-                className="px-3 py-1.5 rounded-full bg-white border border-[#e0e3eb] text-xs font-semibold text-[#131722] shadow-xs hover:border-[#2962ff] hover:text-[#2962ff] transition cursor-pointer"
+                className="px-3 py-1.5 rounded-full bg-[#1e222d] border border-[#2a2e39] text-xs font-semibold text-[#d1d4dc] hover:border-[#2962ff] hover:text-[#2962ff] transition cursor-pointer"
               >
                 {chip}
               </span>
@@ -76,10 +73,10 @@ export default function HomePage() {
 
       {/* Trust & Key Stats Strip */}
       <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 p-6 sm:p-8 rounded-2xl bg-[#f8f9fd] border border-[#e0e3eb]">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 p-6 sm:p-8 rounded-2xl bg-[#1e222d] border border-[#2a2e39]">
           <div>
             <div className="text-xs font-bold uppercase tracking-wider text-[#787b86]">Total Payouts Passed</div>
-            <div className="text-3xl font-black text-[#131722] mt-1">$65,000+</div>
+            <div className="text-3xl font-black text-white mt-1">$65,000+</div>
             <div className="text-xs text-[#089981] font-semibold mt-0.5">Verified Prop Receipts</div>
           </div>
           <div>
@@ -89,7 +86,7 @@ export default function HomePage() {
           </div>
           <div>
             <div className="text-xs font-bold uppercase tracking-wider text-[#787b86]">Students Enrolled</div>
-            <div className="text-3xl font-black text-[#131722] mt-1">1,240+</div>
+            <div className="text-3xl font-black text-white mt-1">1,240+</div>
             <div className="text-xs text-[#787b86] mt-0.5">Pan-India & Overseas</div>
           </div>
           <div>
@@ -102,10 +99,10 @@ export default function HomePage() {
 
       {/* Featured Courses Section */}
       <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-8">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-[#e0e3eb]">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-[#2a2e39]">
           <div>
             <span className="text-xs font-bold uppercase text-[#2962ff] tracking-wider">Curriculum</span>
-            <h2 className="text-2xl sm:text-3xl font-black text-[#131722] mt-1">
+            <h2 className="text-2xl sm:text-3xl font-black text-white mt-1">
               Popular Trading Masterclasses
             </h2>
             <p className="text-sm text-[#787b86] mt-1">
@@ -130,10 +127,10 @@ export default function HomePage() {
 
       {/* Social Proof: Payout Certificates */}
       <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-8">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-[#e0e3eb]">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-[#2a2e39]">
           <div>
             <span className="text-xs font-bold uppercase text-[#089981] tracking-wider">Social Proof</span>
-            <h2 className="text-2xl sm:text-3xl font-black text-[#131722] mt-1">
+            <h2 className="text-2xl sm:text-3xl font-black text-white mt-1">
               Verified Payout Certificates & Statements
             </h2>
             <p className="text-sm text-[#787b86] mt-1">
@@ -153,33 +150,33 @@ export default function HomePage() {
       </section>
 
       {/* Why Choose LearnFxTrade Pillars */}
-      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 border-t border-[#e0e3eb] pt-16">
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 border-t border-[#2a2e39] pt-16">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="p-8 rounded-2xl bg-[#f8f9fd] border border-[#e0e3eb] space-y-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-[#2962ff] shadow-sm font-bold border border-[#e0e3eb]">
+          <div className="p-8 rounded-2xl bg-[#1e222d] border border-[#2a2e39] space-y-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#2962ff]/15 text-[#2962ff] font-bold">
               <BarChart2 className="h-5 w-5" />
             </div>
-            <h3 className="text-lg font-bold text-[#131722]">Institutional Smart Money</h3>
+            <h3 className="text-lg font-bold text-white">Institutional Smart Money</h3>
             <p className="text-sm text-[#787b86] leading-relaxed">
               Understand where real market volume enters. Identify order blocks, fair value gaps, and stop runs before retail indicators trigger.
             </p>
           </div>
 
-          <div className="p-8 rounded-2xl bg-[#f8f9fd] border border-[#e0e3eb] space-y-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-[#089981] shadow-sm font-bold border border-[#e0e3eb]">
+          <div className="p-8 rounded-2xl bg-[#1e222d] border border-[#2a2e39] space-y-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#089981]/15 text-[#089981] font-bold">
               <ShieldCheck className="h-5 w-5" />
             </div>
-            <h3 className="text-lg font-bold text-[#131722]">Prop Firm Funding Blueprint</h3>
+            <h3 className="text-lg font-bold text-white">Prop Firm Funding Blueprint</h3>
             <p className="text-sm text-[#787b86] leading-relaxed">
               Learn the exact 0.5% risk management formula used to pass FTMO and FundedNext evaluations without touching max drawdown.
             </p>
           </div>
 
-          <div className="p-8 rounded-2xl bg-[#f8f9fd] border border-[#e0e3eb] space-y-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-amber-500 shadow-sm font-bold border border-[#e0e3eb]">
+          <div className="p-8 rounded-2xl bg-[#1e222d] border border-[#2a2e39] space-y-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/15 text-amber-400 font-bold">
               <Zap className="h-5 w-5" />
             </div>
-            <h3 className="text-lg font-bold text-[#131722]">Instant Razorpay Access</h3>
+            <h3 className="text-lg font-bold text-white">Instant Razorpay Access</h3>
             <p className="text-sm text-[#787b86] leading-relaxed">
               Pay with any Indian UPI app (GPay, PhonePe, Paytm), debit/credit cards, or netbanking. Access unlocks immediately.
             </p>
@@ -189,11 +186,11 @@ export default function HomePage() {
 
       {/* Bottom CTA Banner */}
       <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="rounded-3xl bg-[#131722] text-white p-10 sm:p-16 text-center space-y-6">
+        <div className="rounded-3xl bg-[#1e222d] border border-[#2a2e39] text-white p-10 sm:p-16 text-center space-y-6">
           <h2 className="text-3xl sm:text-5xl font-black max-w-2xl mx-auto leading-tight">
             Ready to trade with true institutional discipline?
           </h2>
-          <p className="text-sm sm:text-base text-[#d1d4dc] max-w-xl mx-auto leading-relaxed">
+          <p className="text-sm sm:text-base text-[#787b86] max-w-xl mx-auto leading-relaxed">
             Gain immediate access to all video lessons, execution checklists, and free preview lectures.
           </p>
           <div className="pt-2">

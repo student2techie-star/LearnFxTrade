@@ -19,23 +19,23 @@ export default function CourseCard({ course }: Props) {
   );
 
   return (
-    <div className="tv-card-clean group flex flex-col justify-between overflow-hidden">
+    <div className="tv-dark-card group flex flex-col justify-between overflow-hidden">
       <div>
         {/* Media Thumbnail */}
-        <div className="relative aspect-[16/9] w-full overflow-hidden bg-[#f0f3fa]">
+        <div className="relative aspect-[16/9] w-full overflow-hidden bg-[#181d2a]">
           <img
             src={course.thumbnailUrl}
             alt={course.title}
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-80" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#1e222d] via-transparent to-transparent opacity-90" />
 
           {/* Category Badges */}
           <div className="absolute top-3 left-3 flex items-center gap-2">
-            <span className="rounded-full bg-white/90 backdrop-blur-md px-3 py-1 text-[11px] font-semibold text-[#131722] shadow-sm">
+            <span className="rounded-full bg-[#131722]/90 backdrop-blur-md px-3 py-1 text-[11px] font-semibold text-white border border-[#2a2e39] shadow-sm">
               {course.category}
             </span>
-            <span className="rounded-full bg-white/90 backdrop-blur-md px-2.5 py-0.5 text-[10px] font-semibold text-[#787b86]">
+            <span className="rounded-full bg-[#131722]/90 backdrop-blur-md px-2.5 py-0.5 text-[10px] font-semibold text-[#787b86] border border-[#2a2e39]">
               {course.level}
             </span>
           </div>
@@ -59,7 +59,7 @@ export default function CourseCard({ course }: Props) {
 
         {/* Content Details */}
         <div className="p-5 space-y-3">
-          <h3 className="text-lg font-bold text-[#131722] group-hover:text-[#2962ff] transition-colors line-clamp-2">
+          <h3 className="text-lg font-bold text-white group-hover:text-[#2962ff] transition-colors line-clamp-2">
             {course.title}
           </h3>
 
@@ -82,10 +82,10 @@ export default function CourseCard({ course }: Props) {
       </div>
 
       {/* Pricing & Button */}
-      <div className="p-5 pt-3 border-t border-[#e0e3eb] flex items-center justify-between">
+      <div className="p-5 pt-3 border-t border-[#2a2e39] flex items-center justify-between">
         <div>
           <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-black text-[#131722] font-mono">
+            <span className="text-2xl font-black text-white font-mono">
               ₹{course.priceInr.toLocaleString('en-IN')}
             </span>
             <span className="text-xs text-[#787b86] line-through font-mono">
