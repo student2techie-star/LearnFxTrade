@@ -21,6 +21,11 @@ export default function Navbar() {
   const pathname = usePathname();
   const { user, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const navLinks = [
     { name: 'Home', href: '/' },
@@ -71,7 +76,22 @@ export default function Navbar() {
 
         {/* User Auth & Actions */}
         <div className="hidden md:flex items-center gap-3">
-          {user ? (
+          {!mounted ? (
+            <div className="flex items-center gap-2.5">
+              <Link
+                href="/login"
+                className="px-4 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 rounded-lg transition-colors"
+              >
+                Sign In
+              </Link>
+              <Link
+                href="/register"
+                className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 transition-all shadow-lg shadow-emerald-500/25 active:scale-95"
+              >
+                Join Free
+              </Link>
+            </div>
+          ) : user ? (
             <div className="flex items-center gap-2">
               {user.role === 'admin' ? (
                 <Link
