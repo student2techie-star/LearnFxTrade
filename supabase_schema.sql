@@ -113,12 +113,25 @@ ALTER TABLE public.certificates ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.offline_batches ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 
--- Public Read Policies (Allow anyone to view published courses, certificates, and offline batches)
+-- Read & Write Policies
 CREATE POLICY "Allow public read courses" ON public.courses FOR SELECT USING (true);
+CREATE POLICY "Allow public write courses" ON public.courses FOR ALL USING (true) WITH CHECK (true);
+
 CREATE POLICY "Allow public read certificates" ON public.certificates FOR SELECT USING (true);
+CREATE POLICY "Allow public write certificates" ON public.certificates FOR ALL USING (true) WITH CHECK (true);
+
 CREATE POLICY "Allow public read offline batches" ON public.offline_batches FOR SELECT USING (true);
-CREATE POLICY "Allow public read preview lessons" ON public.lessons FOR SELECT USING (true);
-CREATE POLICY "Allow authenticated read users" ON public.users FOR SELECT USING (true);
-CREATE POLICY "Allow authenticated read enrollments" ON public.enrollments FOR SELECT USING (true);
-CREATE POLICY "Allow public insert users" ON public.users FOR INSERT WITH CHECK (true);
-CREATE POLICY "Allow public insert orders" ON public.orders FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow public write offline batches" ON public.offline_batches FOR ALL USING (true) WITH CHECK (true);
+
+CREATE POLICY "Allow public read lessons" ON public.lessons FOR SELECT USING (true);
+CREATE POLICY "Allow public write lessons" ON public.lessons FOR ALL USING (true) WITH CHECK (true);
+
+CREATE POLICY "Allow public read users" ON public.users FOR SELECT USING (true);
+CREATE POLICY "Allow public insert users" ON public.users FOR ALL USING (true) WITH CHECK (true);
+
+CREATE POLICY "Allow public read enrollments" ON public.enrollments FOR SELECT USING (true);
+CREATE POLICY "Allow public write enrollments" ON public.enrollments FOR ALL USING (true) WITH CHECK (true);
+
+CREATE POLICY "Allow public read orders" ON public.orders FOR SELECT USING (true);
+CREATE POLICY "Allow public write orders" ON public.orders FOR ALL USING (true) WITH CHECK (true);
+
