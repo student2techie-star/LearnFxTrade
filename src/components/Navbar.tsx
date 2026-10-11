@@ -11,9 +11,9 @@ import {
   LogOut,
   Menu,
   X,
-  Search,
   GraduationCap
 } from 'lucide-react';
+
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -45,7 +45,7 @@ export default function Navbar() {
       {/* Main Pure Black Header */}
       <div className="w-full border-b border-[#222222] bg-black/95 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          {/* Brand Logo & Search */}
+          {/* Brand Logo */}
           <div className="flex items-center gap-6">
             <Link href="/" className="flex items-center gap-2.5 group">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#10b981] text-black font-black shadow-sm group-hover:bg-[#059669] transition">
@@ -58,14 +58,8 @@ export default function Navbar() {
                 <span className="text-[11px] font-bold text-[#a1a1aa]">India</span>
               </div>
             </Link>
-
-            {/* TradingView Search Pill */}
-            <div className="hidden lg:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#111111] text-xs text-[#a1a1aa] border border-[#222222] hover:border-[#333333] transition cursor-pointer">
-              <Search className="h-3.5 w-3.5 text-[#a1a1aa]" />
-              <span className="text-white">Search markets, SMC courses, strategies...</span>
-              <kbd className="text-[10px] bg-black px-1.5 py-0.5 rounded border border-[#222222] text-[#a1a1aa] font-mono">⌘K</kbd>
-            </div>
           </div>
+
 
           {/* Desktop Nav Links */}
           <nav className="hidden md:flex items-center gap-1">
