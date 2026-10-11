@@ -2,43 +2,51 @@
 
 @layer base {
   :root {
-    --background: #000000;
-    --surface: #0a0a0a;
-    --surface-hover: #121212;
-    --foreground: #ffffff;
-    --muted: #888888;
-    --border: #222222;
-    --border-hover: #444444;
-    --accent: #ffffff;
-    --accent-contrast: #000000;
+    --background: #131722;
+    --surface: #1e222d;
+    --surface-hover: #2a2e39;
+    --tv-blue: #2962ff;
+    --tv-blue-hover: #1e53e5;
+    --tv-green: #089981;
+    --tv-red: #f23645;
+    --foreground: #d1d4dc;
+    --text-white: #ffffff;
+    --text-muted: #787b86;
+    --border: #2a2e39;
+    --border-light: #363a45;
   }
 
   body {
-    background-color: #000000;
-    color: #ededed;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: -apple-system, BlinkMacSystemFont, "Trebuchet MS", Roboto, Ubuntu, sans-serif;
     overflow-x: hidden;
-    letter-spacing: -0.015em;
   }
 }
 
-/* Minimalist Clean Borders & Cards */
-.clean-card {
-  background: #0a0a0a;
-  border: 1px solid #222222;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+/* TradingView style cards & panels */
+.tv-card {
+  background-color: #1e222d;
+  border: 1px solid #2a2e39;
+  border-radius: 8px;
+  transition: all 0.2s ease;
 }
 
-.clean-card:hover {
-  border-color: #444444;
-  background: #111111;
+.tv-card:hover {
+  border-color: #363a45;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
 }
 
-.clean-glass {
-  background: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid #1c1c1c;
+.tv-button-primary {
+  background-color: #2962ff;
+  color: #ffffff;
+  border-radius: 6px;
+  font-weight: 600;
+  transition: background-color 0.15s ease;
+}
+
+.tv-button-primary:hover {
+  background-color: #1e53e5;
 }
 
 /* Ticker Animation */
@@ -50,14 +58,14 @@
 .animate-ticker {
   display: flex;
   width: max-content;
-  animation: tickerSlide 40s linear infinite;
+  animation: tickerSlide 35s linear infinite;
 }
 
 .animate-ticker:hover {
   animation-play-state: paused;
 }
 
-/* Floating Watermark for Videos */
+/* Watermark Float */
 @keyframes floatWatermark {
   0% { transform: translate(10%, 15%); opacity: 0.18; }
   25% { transform: translate(75%, 25%); opacity: 0.26; }
@@ -70,18 +78,18 @@
   animation: floatWatermark 20s ease-in-out infinite;
 }
 
-/* Minimalist Scrollbar */
+/* TradingView Scrollbars */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #000000;
+  background: #131722;
 }
 ::-webkit-scrollbar-thumb {
-  background: #262626;
-  border-radius: 9999px;
+  background: #2a2e39;
+  border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #404040;
+  background: #434651;
 }
