@@ -35,9 +35,6 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 w-full transition-all bg-black">
-      {/* Top Real-time Market Data Ticker */}
-      <MarketTicker />
-
       {/* Main Pure Black Header */}
       <div className="w-full border-b border-[#222222] bg-black/95 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
