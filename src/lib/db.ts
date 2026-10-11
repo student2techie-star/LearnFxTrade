@@ -280,7 +280,21 @@ class DataStore {
     if (b.bookedSeats >= b.totalSeats) b.status = 'sold_out';
     return b;
   }
+
+  bookOfflineSeat(batchId: string, studentName: string): { success: boolean; batch?: OfflineBatch; error?: string } {
+    const b = this.offlineBatches.find(batch => batch.id === batchId);
+    if (!b) return { success: false, error: 'Batch not found' };
+    if (b.bookedSeats >= b.totalSeats) return { success: false, error: 'Batch is already sold out!' };
+
+    b.bookedSeats += 1;
+    if (!b.enrolledStudents) b.enrolledStudents = [];
+    b.enrolledStudents.push(studentName);
+    if (b.bookedSeats >= b.totalSeats) b.status = 'sold_out';
+
+    return { success: true, batch: b };
+  }
 }
+
 
 
 // Global singleton instance so memory is shared across server route hits

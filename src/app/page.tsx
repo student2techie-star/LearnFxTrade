@@ -146,6 +146,35 @@ export default function HomePage() {
         <CertificateGrid certificates={certificates} limit={3} />
       </section>
 
+      {/* 4.5 OFFLINE CLASSROOM BATCHES CALLOUT */}
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="relative overflow-hidden rounded-3xl border border-[#222222] bg-gradient-to-r from-[#0d1612] via-[#111111] to-[#0c0c0e] p-8 sm:p-10 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-2xl">
+          <div className="space-y-2 max-w-2xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#10b981]/15 text-[#10b981] text-xs font-bold uppercase tracking-wider border border-[#10b981]/30">
+              <span className="h-2 w-2 rounded-full bg-[#10b981] animate-ping" />
+              In-Person Classroom Workshops
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-black text-white">
+              Prefer Offline Classes? Join Us in Bengaluru, Mumbai & Delhi.
+            </h2>
+            <p className="text-xs sm:text-sm text-[#a1a1aa] leading-relaxed">
+              Experience institutional live trading on big screens with the mentor during market hours. Limited seats per batch with real-time seat tracking.
+            </p>
+          </div>
+
+          <div className="shrink-0">
+            <Link
+              href="/offline"
+              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-[#10b981] hover:bg-[#059669] text-black font-extrabold text-xs transition shadow-lg shadow-[#10b981]/20 cursor-pointer"
+            >
+              <span>Explore Offline Batches & Reserve Seat</span>
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+
       {/* 5. TRUST & VERIFIED STATS STRIP */}
       <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-6 rounded-2xl bg-[#111111] border border-[#222222]">

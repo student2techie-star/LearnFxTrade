@@ -27,11 +27,13 @@ export default function Navbar() {
 
   const navLinks = [
     { name: 'Home', href: '/' },
-    { name: 'Courses', href: '/courses' },
+    { name: 'Online Courses', href: '/courses' },
+    { name: 'Offline Classes', href: '/offline' },
     { name: 'Payout Proofs', href: '/certificates' },
     { name: 'About Mentor', href: '/about' },
     { name: 'Help Desk', href: '/contact' },
   ];
+
 
   // Do not render the website public navbar on admin routes
   if (pathname?.startsWith('/admin')) {
