@@ -41,6 +41,7 @@ export async function POST(req: Request) {
         advanceFeeInr: body.advanceFeeInr !== undefined ? Number(body.advanceFeeInr) : Math.round((Number(priceInr) || 0) * 0.25),
         hostMentor: hostMentor || 'Somnath (Lead Trader)',
         platform: platform || 'Zoom',
+        meetingUrl: body.meetingUrl || '',
         totalSeats: Number(totalSeats) || 100,
         status: 'upcoming',
         description: description || '',
@@ -62,9 +63,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Session ID is required' }, { status: 400 });
     }
 
+    const contactParts = [studentEmail, phone].filter(Boolean).join(' | ');
     const attendee = studentName
-      ? `${studentName} (${studentEmail || phone || 'Enrolled'})`
-      : studentEmail || 'Anonymous Trader';
+      ? `${studentName} (${contactParts || 'Enrolled'})`
+      : contactParts || 'Anonymous Trader';
 
     const result = db.enrollInLiveSession(sessionId, attendee);
     if (!result.success) {

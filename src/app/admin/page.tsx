@@ -28,6 +28,9 @@ import {
   Filter,
   Radio,
   Video,
+  Send,
+  MessageSquare,
+  Copy,
 } from 'lucide-react';
 import { LiveSession } from '@/lib/types';
 
@@ -104,7 +107,11 @@ export default function AdminPage() {
 
   // Live / Online Registered Students Filter States
   const [selectedLiveSessionFilter, setSelectedLiveSessionFilter] = useState<string>('all');
+  const [selectedLiveDateFilter, setSelectedLiveDateFilter] = useState<string>('all');
   const [liveStudentSearch, setLiveStudentSearch] = useState<string>('');
+  const [copiedLinkSessionId, setCopiedLinkSessionId] = useState<string | null>(null);
+  const [broadcastModalSession, setBroadcastModalSession] = useState<LiveSession | null>(null);
+  const [customMeetingLink, setCustomMeetingLink] = useState<string>('');
 
   // Live Session Form State
   const [liveSessionForm, setLiveSessionForm] = useState({
@@ -119,6 +126,7 @@ export default function AdminPage() {
     advanceFeeInr: 399,
     hostMentor: 'Somnath (Lead Trader)',
     platform: 'Zoom' as 'Zoom' | 'Google Meet' | 'YouTube Live',
+    meetingUrl: 'https://zoom.us/j/',
     totalSeats: 100,
     description: '',
   });
@@ -432,6 +440,7 @@ export default function AdminPage() {
           advanceFeeInr: 399,
           hostMentor: 'Somnath (Lead Trader)',
           platform: 'Zoom',
+          meetingUrl: 'https://zoom.us/j/',
           totalSeats: 100,
           description: '',
         });
@@ -1743,6 +1752,22 @@ export default function AdminPage() {
                     </div>
 
                     <div className="sm:col-span-2">
+                      <label className="block text-xs font-bold text-[#a1a1aa] uppercase mb-1 flex items-center justify-between">
+                        <span className="flex items-center gap-1.5 text-cyan-400">
+                          <Video className="h-3.5 w-3.5" /> Meeting Link (Zoom / Google Meet URL)
+                        </span>
+                        <span className="text-[10px] text-[#71717a]">Sent to students via WhatsApp</span>
+                      </label>
+                      <input
+                        type="url"
+                        value={liveSessionForm.meetingUrl}
+                        onChange={(e) => setLiveSessionForm({ ...liveSessionForm, meetingUrl: e.target.value })}
+                        placeholder="https://zoom.us/j/98234710293 or https://meet.google.com/abc-defg-hij"
+                        className="w-full px-3 py-2 rounded-xl bg-[#141417] border border-[#222222] text-xs text-white focus:outline-none focus:border-cyan-400 font-mono"
+                      />
+                    </div>
+
+                    <div className="sm:col-span-2">
                       <label className="block text-xs font-bold text-[#a1a1aa] uppercase mb-1">Session Topic & Objectives</label>
                       <input
                         type="text"
@@ -1863,8 +1888,27 @@ export default function AdminPage() {
                 </div>
 
                 {/* Filter and Search Bar */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
-                  {/* Session Filter Dropdown */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-3 pt-1">
+                  {/* 1. Date Filter Dropdown */}
+                  <div className="space-y-1">
+                    <label className="text-xs text-[#a1a1aa] font-semibold flex items-center gap-1.5">
+                      <Calendar className="h-3.5 w-3.5 text-[#10b981]" /> Filter by Schedule Date:
+                    </label>
+                    <select
+                      value={selectedLiveDateFilter}
+                      onChange={(e) => setSelectedLiveDateFilter(e.target.value)}
+                      className="w-full p-2.5 rounded-xl bg-black border border-[#222222] text-xs font-semibold text-white focus:border-[#10b981] focus:outline-none"
+                    >
+                      <option value="all">All Dates ({liveSessions.length} sessions)</option>
+                      {Array.from(new Set(liveSessions.map((s) => s.scheduledDate))).map((d) => (
+                        <option key={d} value={d}>
+                          {d}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* 2. Session Name Filter Dropdown */}
                   <div className="space-y-1">
                     <label className="text-xs text-[#a1a1aa] font-semibold flex items-center gap-1.5">
                       <Filter className="h-3.5 w-3.5 text-rose-500" /> Filter by Live Session:
@@ -1883,7 +1927,7 @@ export default function AdminPage() {
                     </select>
                   </div>
 
-                  {/* Student Search */}
+                  {/* 3. Student Search */}
                   <div className="space-y-1 md:col-span-2">
                     <label className="text-xs text-[#a1a1aa] font-semibold flex items-center gap-1.5">
                       <Search className="h-3.5 w-3.5 text-rose-500" /> Search Online Student Name / Email / Phone:
@@ -1908,13 +1952,18 @@ export default function AdminPage() {
                   if (selectedLiveSessionFilter !== 'all' && s.id !== selectedLiveSessionFilter) {
                     return false;
                   }
+                  if (selectedLiveDateFilter !== 'all' && s.scheduledDate !== selectedLiveDateFilter) {
+                    return false;
+                  }
                   return true;
                 });
 
                 if (filteredSessions.length === 0) {
                   return (
-                    <div className="rounded-2xl border border-[#222222] bg-[#111111] p-12 text-center text-xs text-[#a1a1aa]">
-                      No live sessions found matching the selected filter.
+                    <div className="rounded-2xl border border-[#222222] bg-[#111111] p-12 text-center text-xs text-[#a1a1aa] space-y-2">
+                      <Calendar className="h-8 w-8 text-[#71717a] mx-auto" />
+                      <div className="text-white font-bold">No live sessions found matching the selected date or session filter.</div>
+                      <div className="text-[#a1a1aa]">Try switching to &quot;All Dates&quot; or &quot;All Live Sessions&quot;.</div>
                     </div>
                   );
                 }
@@ -1927,13 +1976,15 @@ export default function AdminPage() {
                         studentStr.toLowerCase().includes(liveStudentSearch.toLowerCase())
                       );
 
+                      const meetingLink = session.meetingUrl || 'https://zoom.us/j/live-fxtrade';
+
                       return (
                         <div
                           key={session.id}
-                          className="rounded-2xl border border-[#222222] bg-[#111111] overflow-hidden"
+                          className="rounded-2xl border border-[#222222] bg-[#111111] overflow-hidden shadow-xl"
                         >
-                          {/* Session Header Bar */}
-                          <div className="bg-[#141416] p-4 sm:p-5 border-b border-[#222222] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                          {/* Session Header Bar with Send Link to All in WhatsApp */}
+                          <div className="bg-[#141416] p-4 sm:p-5 border-b border-[#222222] flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                             <div className="space-y-1">
                               <div className="flex flex-wrap items-center gap-2">
                                 <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/30">
@@ -1942,26 +1993,48 @@ export default function AdminPage() {
                                 <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-[#1a1a1d] text-cyan-400 border border-[#222222]">
                                   {session.platform}
                                 </span>
-                                <span className="text-xs text-[#a1a1aa]">• {session.scheduledDate}</span>
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/15 border border-amber-500/30 text-amber-400">
+                                  <Calendar className="h-3 w-3" /> {session.scheduledDate}
+                                </span>
                               </div>
-                              <h3 className="text-base font-bold text-white">{session.title}</h3>
+                              <h3 className="text-base font-bold text-white pt-1">{session.title}</h3>
                               <p className="text-xs text-[#a1a1aa]">{session.topic}</p>
                             </div>
 
-                            <div className="flex items-center gap-4 bg-black/60 p-3 rounded-xl border border-[#222222] shrink-0 self-start sm:self-auto">
-                              <div>
-                                <div className="text-lg font-black text-white font-mono">
-                                  {allAttendees.length} / {session.totalSeats}
+                            <div className="flex flex-wrap items-center gap-3">
+                              {/* Session Stats */}
+                              <div className="flex items-center gap-3 bg-black/60 px-3.5 py-2.5 rounded-xl border border-[#222222]">
+                                <div>
+                                  <div className="text-base font-black text-white font-mono">
+                                    {allAttendees.length} / {session.totalSeats}
+                                  </div>
+                                  <div className="text-[10px] text-[#a1a1aa]">Enrolled</div>
                                 </div>
-                                <div className="text-[10px] text-[#a1a1aa]">Seats Enrolled</div>
-                              </div>
-                              <div className="h-7 w-px bg-[#222222]" />
-                              <div>
-                                <div className="text-lg font-black text-[#10b981] font-mono">
-                                  {Math.max(0, session.totalSeats - allAttendees.length)}
+                                <div className="h-6 w-px bg-[#222222]" />
+                                <div>
+                                  <div className="text-base font-black text-[#10b981] font-mono">
+                                    {Math.max(0, session.totalSeats - allAttendees.length)}
+                                  </div>
+                                  <div className="text-[10px] text-[#a1a1aa]">Seats Left</div>
                                 </div>
-                                <div className="text-[10px] text-[#a1a1aa]">Seats Left</div>
                               </div>
+
+                              {/* SEND LINK TO ALL IN WHATSAPP BUTTON */}
+                              <button
+                                onClick={() => {
+                                  setBroadcastModalSession(session);
+                                  setCustomMeetingLink(session.meetingUrl || '');
+                                }}
+                                disabled={allAttendees.length === 0}
+                                className={`px-4 py-2.5 rounded-xl font-extrabold text-xs flex items-center gap-2 transition cursor-pointer shadow-lg ${
+                                  allAttendees.length === 0
+                                    ? 'bg-[#1e1e22] text-[#71717a] cursor-not-allowed border border-[#27272a]'
+                                    : 'bg-[#25D366] hover:bg-[#1ebd5a] text-black shadow-[#25D366]/20'
+                                }`}
+                              >
+                                <MessageSquare className="h-4 w-4 fill-black" />
+                                <span>Send Link to All in WhatsApp ({allAttendees.length})</span>
+                              </button>
                             </div>
                           </div>
 
@@ -1974,8 +2047,8 @@ export default function AdminPage() {
                                     <th className="px-5 py-3 w-12">#</th>
                                     <th className="px-5 py-3">Student Name</th>
                                     <th className="px-5 py-3">Registered Contact Info</th>
-                                    <th className="px-5 py-3">Live Session Timing</th>
-                                    <th className="px-5 py-3">Platform & Link Status</th>
+                                    <th className="px-5 py-3">Live Session Schedule</th>
+                                    <th className="px-5 py-3 text-right">Send WhatsApp Link</th>
                                   </tr>
                                 </thead>
                                 <tbody className="divide-y divide-[#1e1e22]">
@@ -1983,6 +2056,18 @@ export default function AdminPage() {
                                     const match = rawName.match(/^(.*?)\s*\((.*?)\)$/);
                                     const studentName = match ? match[1].trim() : rawName;
                                     const studentContact = match ? match[2].trim() : 'Registered on Live Page';
+
+                                    // Extract phone number from contact string
+                                    const phoneMatch = studentContact.match(/(\+?\d[\d\s-]{8,}\d)/);
+                                    const cleanPhone = phoneMatch ? phoneMatch[0].replace(/[\s-]/g, '').replace(/^\+/, '') : '';
+
+                                    const waMessage = encodeURIComponent(
+                                      `Hi ${studentName},\n\nHere is your official access link for the live trading session:\n\n📌 Session: ${session.title}\n📅 Date & Time: ${session.scheduledDate}\n🎥 Platform: ${session.platform}\n🔗 Join Meeting Link: ${meetingLink}\n\nPlease join 5 minutes early to test your audio & video.\n\nHappy Trading!\n— LearnFxTrade Team`
+                                    );
+
+                                    const waDirectUrl = cleanPhone
+                                      ? `https://wa.me/${cleanPhone}?text=${waMessage}`
+                                      : `https://wa.me/?text=${waMessage}`;
 
                                     return (
                                       <tr key={idx} className="hover:bg-[#141416] transition">
@@ -2000,11 +2085,18 @@ export default function AdminPage() {
                                         </td>
                                         <td className="px-5 py-3.5 text-[#a1a1aa]">
                                           <span className="font-semibold text-white">{session.scheduledDate}</span>
+                                          <span className="block text-[10px] text-cyan-400 font-mono">{session.platform}</span>
                                         </td>
-                                        <td className="px-5 py-3.5">
-                                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#10b981]/15 text-[#10b981] border border-[#10b981]/30">
-                                            <CheckCircle className="h-3 w-3" /> {session.platform} Pass Active
-                                          </span>
+                                        <td className="px-5 py-3.5 text-right">
+                                          <a
+                                            href={waDirectUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#25D366]/15 hover:bg-[#25D366]/25 border border-[#25D366]/40 text-[#25D366] font-bold text-[11px] transition"
+                                          >
+                                            <Send className="h-3 w-3" />
+                                            <span>WhatsApp Link</span>
+                                          </a>
                                         </td>
                                       </tr>
                                     );
@@ -2070,6 +2162,149 @@ export default function AdminPage() {
           )}
         </main>
       </div>
+
+      {/* WHATSAPP BROADCAST MODAL TO SEND LINK TO ALL REGISTERED STUDENTS */}
+      {broadcastModalSession && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-sm p-4 overflow-y-auto">
+          <div className="relative w-full max-w-2xl rounded-3xl bg-[#0e0e11] border border-[#27272a] p-6 sm:p-8 text-white shadow-2xl space-y-6 animate-in fade-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="flex items-start justify-between gap-4 border-b border-[#222226] pb-4">
+              <div>
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#25D366]/15 border border-[#25D366]/30 text-[#25D366] text-xs font-bold mb-2">
+                  <MessageSquare className="h-3.5 w-3.5 fill-[#25D366]" /> WhatsApp Broadcast Hub
+                </div>
+                <h3 className="text-xl font-black text-white">
+                  Send Meeting Link to All Students
+                </h3>
+                <p className="text-xs text-[#a1a1aa] mt-0.5">
+                  Session: <strong className="text-white">{broadcastModalSession.title}</strong> • {broadcastModalSession.scheduledDate}
+                </p>
+              </div>
+
+              <button
+                onClick={() => setBroadcastModalSession(null)}
+                className="p-2 rounded-xl bg-[#18181b] text-[#a1a1aa] hover:text-white transition cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Editable Meeting Link */}
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-white uppercase flex items-center justify-between">
+                <span className="flex items-center gap-1.5 text-cyan-400">
+                  <Video className="h-3.5 w-3.5" /> Meeting Room Link (Zoom / Google Meet URL):
+                </span>
+                <span className="text-[11px] text-[#a1a1aa] font-normal">Edit before sending</span>
+              </label>
+              <input
+                type="url"
+                value={customMeetingLink}
+                onChange={(e) => setCustomMeetingLink(e.target.value)}
+                placeholder="https://zoom.us/j/98234710293"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-black border border-[#2a2a30] text-xs text-white focus:outline-none focus:border-[#25D366] font-mono"
+              />
+            </div>
+
+            {/* WhatsApp Message Preview & Copy */}
+            {(() => {
+              const attendees = broadcastModalSession.enrolledAttendees || [];
+              const effectiveLink = customMeetingLink || broadcastModalSession.meetingUrl || 'https://zoom.us/j/live-fxtrade';
+              const sampleMessage = `Hi [Student Name],\n\nHere is your official access link for the live trading session:\n\n📌 Session: ${broadcastModalSession.title}\n📅 Date & Time: ${broadcastModalSession.scheduledDate}\n🎥 Platform: ${broadcastModalSession.platform}\n🔗 Join Meeting Link: ${effectiveLink}\n\nPlease join 5 minutes early to test your audio & video.\n\nHappy Trading!\n— LearnFxTrade Team`;
+
+              return (
+                <div className="space-y-4">
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-[#a1a1aa] font-bold uppercase">WhatsApp Message Template:</span>
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(sampleMessage);
+                          setCopiedLinkSessionId(broadcastModalSession.id);
+                          setTimeout(() => setCopiedLinkSessionId(null), 2000);
+                        }}
+                        className="flex items-center gap-1 text-[11px] text-emerald-400 hover:text-emerald-300 font-semibold cursor-pointer"
+                      >
+                        <Copy className="h-3 w-3" />
+                        <span>{copiedLinkSessionId === broadcastModalSession.id ? 'Copied Template!' : 'Copy Message'}</span>
+                      </button>
+                    </div>
+                    <pre className="p-3.5 rounded-2xl bg-[#09090b] border border-[#222226] text-xs text-emerald-300 font-mono whitespace-pre-wrap leading-relaxed select-all">
+                      {sampleMessage}
+                    </pre>
+                  </div>
+
+                  {/* Registered Attendees Dispatch List */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-white font-bold">
+                        Registered Students ({attendees.length}):
+                      </span>
+                      <span className="text-[11px] text-[#a1a1aa]">
+                        Click each student to open WhatsApp with pre-filled message
+                      </span>
+                    </div>
+
+                    <div className="max-h-60 overflow-y-auto space-y-2 pr-1 divide-y divide-[#1e1e24]">
+                      {attendees.map((rawName, i) => {
+                        const match = rawName.match(/^(.*?)\s*\((.*?)\)$/);
+                        const studentName = match ? match[1].trim() : rawName;
+                        const studentContact = match ? match[2].trim() : '';
+
+                        const phoneMatch = studentContact.match(/(\+?\d[\d\s-]{8,}\d)/);
+                        const cleanPhone = phoneMatch ? phoneMatch[0].replace(/[\s-]/g, '').replace(/^\+/, '') : '';
+
+                        const studentMsg = encodeURIComponent(
+                          `Hi ${studentName},\n\nHere is your official access link for the live trading session:\n\n📌 Session: ${broadcastModalSession.title}\n📅 Date & Time: ${broadcastModalSession.scheduledDate}\n🎥 Platform: ${broadcastModalSession.platform}\n🔗 Join Meeting Link: ${effectiveLink}\n\nPlease join 5 minutes early to test your audio & video.\n\nHappy Trading!\n— LearnFxTrade Team`
+                        );
+
+                        const waUrl = cleanPhone
+                          ? `https://wa.me/${cleanPhone}?text=${studentMsg}`
+                          : `https://wa.me/?text=${studentMsg}`;
+
+                        return (
+                          <div
+                            key={i}
+                            className="pt-2 flex items-center justify-between gap-3 text-xs"
+                          >
+                            <div className="flex items-center gap-2">
+                              <span className="font-mono text-[#71717a] text-[11px]">{i + 1}.</span>
+                              <div>
+                                <span className="font-bold text-white block">{studentName}</span>
+                                <span className="text-[11px] text-[#a1a1aa] font-mono">{studentContact || 'Registered'}</span>
+                              </div>
+                            </div>
+
+                            <a
+                              href={waUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-3 py-1.5 rounded-lg bg-[#25D366] hover:bg-[#1ebd5a] text-black font-extrabold text-[11px] flex items-center gap-1.5 transition shrink-0 shadow-sm"
+                            >
+                              <Send className="h-3 w-3 fill-black" />
+                              <span>Send on WhatsApp</span>
+                            </a>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Modal Footer */}
+            <div className="pt-2 border-t border-[#222226] flex justify-end">
+              <button
+                onClick={() => setBroadcastModalSession(null)}
+                className="px-5 py-2.5 rounded-xl bg-[#1e1e24] hover:bg-[#272730] text-white font-bold text-xs transition cursor-pointer"
+              >
+                Done / Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

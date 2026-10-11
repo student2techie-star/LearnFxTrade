@@ -22,8 +22,14 @@ class DataStore {
       advanceFeeInr: 499,
       hostMentor: 'Somnath (Lead Trader)',
       platform: 'Zoom',
+      meetingUrl: 'https://zoom.us/j/98234710293',
       totalSeats: 50,
-      enrolledAttendees: ['Arun Kumar', 'Pooja Venkatesh', 'Karthik R', 'Vignesh K'],
+      enrolledAttendees: [
+        'Arun Kumar (arun.fx@gmail.com | +91 98840 12345)',
+        'Pooja Venkatesh (pooja.trade@gmail.com | +91 97910 88765)',
+        'Karthik R (karthik.smc@yahoo.com | +91 94441 55678)',
+        'Vignesh K (vignesh.k@gmail.com | +91 99620 44321)'
+      ],
       status: 'upcoming',
       description: 'Live interactive screen share during the London open. Ask doubts directly, review charts together, and observe real-time order block validation.',
     },
@@ -38,8 +44,13 @@ class DataStore {
       advanceFeeInr: 399,
       hostMentor: 'Somnath (Lead Trader)',
       platform: 'Google Meet',
+      meetingUrl: 'https://meet.google.com/nif-tyex-pir',
       totalSeats: 40,
-      enrolledAttendees: ['Sanjay Narayanan', 'Divya Balaji', 'Rahul S'],
+      enrolledAttendees: [
+        'Sanjay Narayanan (sanjay.n@gmail.com | +91 98401 77654)',
+        'Divya Balaji (divya.b@outlook.com | +91 99402 33445)',
+        'Rahul S (rahul.trader@gmail.com | +91 97890 11223)'
+      ],
       status: 'upcoming',
       description: 'Live market execution during Indian market trading hours. Master theta management and high-momentum gamma bursts.',
     },
@@ -54,8 +65,12 @@ class DataStore {
       advanceFeeInr: 299,
       hostMentor: 'Somnath (Lead Trader)',
       platform: 'Zoom',
+      meetingUrl: 'https://zoom.us/j/84712093412',
       totalSeats: 60,
-      enrolledAttendees: ['Harish V', 'Meena Rajan'],
+      enrolledAttendees: [
+        'Harish V (harish.funded@gmail.com | +91 98412 66789)',
+        'Meena Rajan (meena.rajan@gmail.com | +91 97103 44556)'
+      ],
       status: 'upcoming',
       description: 'Interactive open floor Q&A session. Bring your recent trading journal for live trade critique and feedback.',
     },

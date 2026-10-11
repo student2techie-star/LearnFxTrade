@@ -118,6 +118,7 @@ export interface LiveSession {
   advanceFeeInr?: number; // Minimum advance booking fee to lock seat (remaining paid before live session)
   hostMentor: string; // "Somnath"
   platform: 'Zoom' | 'Google Meet' | 'YouTube Live';
+  meetingUrl?: string; // e.g. https://zoom.us/j/123456789 or https://meet.google.com/abc-defg-hij
   totalSeats: number;
   enrolledAttendees: string[]; // student names or emails
   status: 'upcoming' | 'live_now' | 'completed';
