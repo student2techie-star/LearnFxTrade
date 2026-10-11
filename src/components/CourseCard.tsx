@@ -59,17 +59,17 @@ export default function CourseCard({ course }: Props) {
 
         {/* Content Details */}
         <div className="p-5 space-y-3">
-          <h3 className="text-lg font-bold text-white group-hover:text-[#2962ff] transition-colors line-clamp-2">
+          <h3 className="text-lg font-bold text-white group-hover:text-[#10b981] transition-colors line-clamp-2">
             {course.title}
           </h3>
 
-          <p className="text-xs text-[#787b86] line-clamp-2 leading-relaxed">
+          <p className="text-xs text-white/70 line-clamp-2 leading-relaxed">
             {course.tagline}
           </p>
 
-          <div className="flex items-center gap-4 text-xs font-medium text-[#787b86] pt-1">
+          <div className="flex items-center gap-4 text-xs font-medium text-white/70 pt-1">
             <span className="flex items-center gap-1.5">
-              <BookOpen className="h-3.5 w-3.5 text-[#2962ff]" />
+              <BookOpen className="h-3.5 w-3.5 text-[#10b981]" />
               {course.lessonsCount || 10} Lessons
             </span>
             <span>•</span>

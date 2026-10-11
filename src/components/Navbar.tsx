@@ -44,12 +44,12 @@ export default function Navbar() {
           {/* Brand Logo & Search */}
           <div className="flex items-center gap-6">
             <Link href="/" className="flex items-center gap-2.5 group">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#2962ff] text-white font-black shadow-sm group-hover:bg-[#1e53e5] transition">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#10b981] text-black font-black shadow-sm group-hover:bg-[#059669] transition">
                 <TrendingUp className="h-4 w-4 stroke-[3]" />
               </div>
               <div className="flex items-baseline gap-1.5">
                 <span className="text-xl font-bold tracking-tight text-white">
-                  LearnFx<span className="text-[#2962ff]">Trade</span>
+                  LearnFx<span className="text-[#10b981]">Trade</span>
                 </span>
                 <span className="text-[11px] font-bold text-[#a1a1aa]">India</span>
               </div>
@@ -114,16 +114,16 @@ export default function Navbar() {
 
                 <Link
                   href="/dashboard"
-                  className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-full bg-[#1e222d] text-white border border-[#2a2e39] hover:bg-[#2a2e39] transition"
+                  className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-full bg-[#111111] text-white border border-[#222222] hover:bg-[#1c1c1c] transition"
                 >
-                  <GraduationCap className="h-4 w-4 text-[#2962ff]" />
+                  <GraduationCap className="h-4 w-4 text-[#10b981]" />
                   <span>My Classroom</span>
                 </Link>
 
                 <button
                   onClick={logout}
                   title="Sign Out"
-                  className="p-2 text-[#787b86] hover:text-rose-400 hover:bg-[#1e222d] rounded-full transition"
+                  className="p-2 text-[#a1a1aa] hover:text-rose-400 hover:bg-[#1c1c1c] rounded-full transition"
                 >
                   <LogOut className="h-4 w-4" />
                 </button>
@@ -132,7 +132,7 @@ export default function Navbar() {
               <div className="flex items-center gap-2">
                 <Link
                   href="/login"
-                  className="px-4 py-2 text-sm font-semibold text-[#d1d4dc] hover:text-white rounded-lg transition"
+                  className="px-4 py-2 text-sm font-semibold text-white/80 hover:text-white rounded-lg transition"
                 >
                   Sign in
                 </Link>
@@ -150,7 +150,7 @@ export default function Navbar() {
           <div className="flex md:hidden">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 text-[#d1d4dc] hover:text-white"
+              className="p-2 text-white/80 hover:text-white"
             >
               {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
@@ -160,33 +160,33 @@ export default function Navbar() {
 
       {/* Mobile Menu Dropdown */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-b border-[#2a2e39] bg-[#131722] px-4 pt-3 pb-6 space-y-3 shadow-2xl">
+        <div className="md:hidden border-b border-[#222222] bg-black px-4 pt-3 pb-6 space-y-3 shadow-2xl">
           <div className="flex flex-col space-y-1">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className="px-3 py-2 text-sm font-semibold rounded-lg text-[#d1d4dc] hover:bg-[#1e222d] hover:text-white"
+                className="px-3 py-2 text-sm font-semibold rounded-lg text-white/80 hover:bg-[#1c1c1c] hover:text-white"
               >
                 {link.name}
               </Link>
             ))}
           </div>
 
-          <div className="pt-3 border-t border-[#2a2e39] flex flex-col gap-2">
+          <div className="pt-3 border-t border-[#222222] flex flex-col gap-2">
             {user ? (
               <>
                 <Link
                   href="/dashboard"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-2 px-3 py-2 text-sm font-bold rounded-lg bg-[#1e222d] text-white"
+                  className="flex items-center gap-2 px-3 py-2 text-sm font-bold rounded-lg bg-[#111111] text-white"
                 >
-                  <GraduationCap className="h-4 w-4 text-[#2962ff]" /> My Dashboard
+                  <GraduationCap className="h-4 w-4 text-[#10b981]" /> My Dashboard
                 </Link>
                 <button
                   onClick={() => { logout(); setMobileMenuOpen(false); }}
-                  className="flex items-center gap-2 px-3 py-2 text-sm text-rose-400 hover:bg-[#1e222d] rounded-lg text-left"
+                  className="flex items-center gap-2 px-3 py-2 text-sm text-rose-400 hover:bg-[#1c1c1c] rounded-lg text-left"
                 >
                   <LogOut className="h-4 w-4" /> Sign Out
                 </button>
@@ -196,14 +196,14 @@ export default function Navbar() {
                 <Link
                   href="/login"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="w-full text-center py-2 text-sm font-semibold text-[#d1d4dc] bg-[#1e222d] rounded-lg"
+                  className="w-full text-center py-2 text-sm font-semibold text-white/80 bg-[#111111] rounded-lg"
                 >
                   Sign in
                 </Link>
                 <Link
                   href="/register"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="w-full text-center py-2 text-sm font-semibold text-white bg-[#2962ff] rounded-full"
+                  className="w-full text-center py-2 text-sm font-semibold text-black bg-[#10b981] rounded-full"
                 >
                   Get started
                 </Link>

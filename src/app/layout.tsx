@@ -35,13 +35,13 @@ export default function RootLayout({
           strategy="lazyOnload"
         />
       </head>
-      <body className="min-h-screen bg-black text-white antialiased flex flex-col selection:bg-[#2962ff] selection:text-white">
+      <body className="min-h-screen bg-black text-white antialiased flex flex-col selection:bg-[#10b981] selection:text-black">
         <AuthProvider>
           <Suspense fallback={<div className="h-20 bg-black border-b border-[#222222]" />}>
             <Navbar />
           </Suspense>
           <main className="flex-1">
-            <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="h-8 w-8 animate-spin rounded-full border-4 border-[#2962ff] border-t-transparent" /></div>}>
+            <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="h-8 w-8 animate-spin rounded-full border-4 border-[#10b981] border-t-transparent" /></div>}>
               {children}
             </Suspense>
           </main>

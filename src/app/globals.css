@@ -6,16 +6,16 @@
 
 /* ---------- 1. TOKENS ---------- */
 :root {
-  /* Brand */
-  --brand: #2962ff;
-  --brand-hover: #1e53e5;
-  --brand-soft: rgba(41, 98, 255, 0.18);
+  /* Brand: Trader Emerald Green */
+  --brand: #10b981;
+  --brand-hover: #059669;
+  --brand-soft: rgba(16, 185, 129, 0.16);
 
   /* Market colors */
-  --up: #089981;
-  --up-soft: rgba(8, 153, 129, 0.18);
+  --up: #10b981;
+  --up-soft: rgba(16, 185, 129, 0.16);
   --down: #f23645;
-  --down-soft: rgba(242, 54, 69, 0.18);
+  --down-soft: rgba(242, 54, 69, 0.16);
   --warn: #ff9800;
   --gold: #fdd835;
 
@@ -34,9 +34,9 @@
 
   /* Legacy & compatibility aliases */
   --background: #000000;
-  --tv-blue: #2962ff;
-  --tv-blue-hover: #1e53e5;
-  --tv-green: #089981;
+  --tv-blue: #10b981;
+  --tv-blue-hover: #059669;
+  --tv-green: #10b981;
   --tv-red: #f23645;
   --foreground: #ffffff;
   --text-white: #ffffff;

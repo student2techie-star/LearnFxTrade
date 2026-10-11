@@ -112,7 +112,7 @@ export default function HomePage() {
             {/* Pure Black & White Hero Typography */}
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-[1.12]">
               Look first / Then leap. <br />
-              <span className="text-[#2962ff]">Where India Learns & Trades with True Edge.</span>
+              <span className="text-[#10b981]">Where India Learns & Trades with True Edge.</span>
             </h1>
 
             <p className="text-sm sm:text-base text-white/80 max-w-2xl mx-auto leading-relaxed">
@@ -121,7 +121,7 @@ export default function HomePage() {
 
             {/* Centered Search Command Bar */}
             <div className="pt-2 max-w-2xl mx-auto">
-              <div className="relative flex items-center w-full rounded-2xl bg-[#111111] border border-[#222222] hover:border-[#2962ff] focus-within:border-[#2962ff] transition shadow-xl p-2">
+              <div className="relative flex items-center w-full rounded-2xl bg-[#111111] border border-[#222222] hover:border-[#10b981] focus-within:border-[#10b981] transition shadow-xl p-2">
                 <Search className="h-5 w-5 text-white/60 ml-3 shrink-0" />
                 <input
                   type="text"
@@ -147,7 +147,7 @@ export default function HomePage() {
                 <Link
                   key={idx}
                   href="/courses"
-                  className="px-2.5 py-1 rounded-lg bg-[#111111] hover:bg-[#1c1c1c] border border-[#222222] text-white hover:text-[#2962ff] transition font-mono text-[11px]"
+                  className="px-2.5 py-1 rounded-lg bg-[#111111] hover:bg-[#1c1c1c] border border-[#222222] text-white hover:text-[#10b981] transition font-mono text-[11px]"
                 >
                   {item}
                 </Link>
@@ -225,8 +225,8 @@ export default function HomePage() {
         <div className="flex items-end justify-between pb-3 border-b border-[#222222]">
           <div>
             <div className="flex items-center gap-2">
-              <BookOpen className="h-4 w-4 text-[#2962ff]" />
-              <span className="text-xs font-bold uppercase text-[#2962ff] tracking-wider">Trading Masterclasses</span>
+              <BookOpen className="h-4 w-4 text-[#10b981]" />
+              <span className="text-xs font-bold uppercase text-[#10b981] tracking-wider">Trading Masterclasses</span>
             </div>
             <h2 className="text-xl sm:text-2xl font-black text-white mt-1">
               Institutional Courses & Syllabi
@@ -234,7 +234,7 @@ export default function HomePage() {
           </div>
           <Link
             href="/courses"
-            className="text-xs font-bold text-[#2962ff] hover:underline flex items-center gap-1"
+            className="text-xs font-bold text-[#10b981] hover:underline flex items-center gap-1"
           >
             <span>View All Masterclasses</span>
             <ChevronRight className="h-4 w-4" />
@@ -253,8 +253,8 @@ export default function HomePage() {
         <div className="flex items-end justify-between pb-3 border-b border-[#222222]">
           <div>
             <div className="flex items-center gap-2">
-              <Award className="h-4 w-4 text-[#089981]" />
-              <span className="text-xs font-bold uppercase text-[#089981] tracking-wider">Verified Proof</span>
+              <Award className="h-4 w-4 text-[#10b981]" />
+              <span className="text-xs font-bold uppercase text-[#10b981] tracking-wider">Verified Proof</span>
             </div>
             <h2 className="text-xl sm:text-2xl font-black text-white mt-1">
               Prop Firm Payouts & Funded Statements
@@ -262,7 +262,7 @@ export default function HomePage() {
           </div>
           <Link
             href="/certificates"
-            className="text-xs font-bold text-[#2962ff] hover:underline flex items-center gap-1"
+            className="text-xs font-bold text-[#10b981] hover:underline flex items-center gap-1"
           >
             <span>Inspect All Proofs</span>
             <ChevronRight className="h-4 w-4" />
@@ -277,8 +277,8 @@ export default function HomePage() {
         <div className="flex items-end justify-between pb-3 border-b border-[#222222]">
           <div>
             <div className="flex items-center gap-2">
-              <Flame className="h-4 w-4 text-[#2962ff]" />
-              <span className="text-xs font-bold uppercase text-[#2962ff] tracking-wider">Trade Setups Feed</span>
+              <Flame className="h-4 w-4 text-[#10b981]" />
+              <span className="text-xs font-bold uppercase text-[#10b981] tracking-wider">Trade Setups Feed</span>
             </div>
             <h2 className="text-xl sm:text-2xl font-black text-white mt-1">
               Institutional SMC Setups & Case Studies
@@ -286,7 +286,7 @@ export default function HomePage() {
           </div>
           <Link
             href="/courses"
-            className="text-xs font-bold text-[#2962ff] hover:underline flex items-center gap-1"
+            className="text-xs font-bold text-[#10b981] hover:underline flex items-center gap-1"
           >
             <span>Learn these strategies</span>
             <ChevronRight className="h-4 w-4" />
@@ -301,12 +301,12 @@ export default function HomePage() {
             >
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-mono font-bold text-[#2962ff] bg-black px-2 py-0.5 rounded border border-[#222222]">
+                  <span className="text-xs font-mono font-bold text-[#10b981] bg-black px-2 py-0.5 rounded border border-[#222222]">
                     {idea.pair}
                   </span>
                   <span
                     className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded ${
-                      idea.bias === 'Long' ? 'bg-[#089981]/20 text-[#089981]' : 'bg-[#f23645]/20 text-[#f23645]'
+                      idea.bias === 'Long' ? 'bg-[#10b981]/20 text-[#10b981]' : 'bg-[#f23645]/20 text-[#f23645]'
                     }`}
                   >
                     {idea.bias} Setup
@@ -324,7 +324,7 @@ export default function HomePage() {
 
               <div className="pt-3 border-t border-[#222222] flex items-center justify-between text-xs text-white/60">
                 <div className="flex items-center gap-2">
-                  <div className="h-6 w-6 rounded-full bg-[#2962ff] text-white flex items-center justify-center font-bold text-[10px]">
+                  <div className="h-6 w-6 rounded-full bg-[#10b981] text-black flex items-center justify-center font-bold text-[10px]">
                     {idea.author.charAt(0)}
                   </div>
                   <span className="truncate text-[11px] font-semibold text-white">{idea.author}</span>
@@ -342,11 +342,11 @@ export default function HomePage() {
           <div className="space-y-1">
             <div className="text-[11px] font-bold uppercase tracking-wider text-white/60">Total Payouts</div>
             <div className="text-2xl font-black text-white font-mono">$65,000+</div>
-            <div className="text-xs text-[#089981] font-semibold">FTMO & FundedNext</div>
+            <div className="text-xs text-[#10b981] font-semibold">FTMO & FundedNext</div>
           </div>
           <div className="space-y-1">
             <div className="text-[11px] font-bold uppercase tracking-wider text-white/60">Trade Execution R:R</div>
-            <div className="text-2xl font-black text-[#2962ff] font-mono">1:3.5+</div>
+            <div className="text-2xl font-black text-[#10b981] font-mono">1:3.5+</div>
             <div className="text-xs text-white/80">Smart Money Confluence</div>
           </div>
           <div className="space-y-1">
@@ -356,7 +356,7 @@ export default function HomePage() {
           </div>
           <div className="space-y-1">
             <div className="text-[11px] font-bold uppercase tracking-wider text-white/60">Razorpay Payments</div>
-            <div className="text-2xl font-black text-[#089981] font-mono">Instant</div>
+            <div className="text-2xl font-black text-[#10b981] font-mono">Instant</div>
             <div className="text-xs text-white/80">UPI & Card Access</div>
           </div>
         </div>

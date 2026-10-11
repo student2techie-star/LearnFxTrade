@@ -42,14 +42,14 @@ export default function CertificateGrid({ certificates, limit }: Props) {
 
               {/* Amount badge on image */}
               <div className="absolute bottom-3 right-3">
-                <span className="inline-flex items-center rounded-lg bg-[#2962ff] text-white font-mono font-bold px-3 py-1 text-xs shadow-md">
+                <span className="inline-flex items-center rounded-lg bg-[#10b981] text-black font-mono font-bold px-3 py-1 text-xs shadow-md">
                   {cert.amount}
                 </span>
               </div>
 
               {/* Hover overlay hint */}
               <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/60 backdrop-blur-[2px]">
-                <span className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#2962ff] text-white text-xs font-bold shadow-lg">
+                <span className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#10b981] text-black text-xs font-bold shadow-lg">
                   <ZoomIn className="h-4 w-4" /> Inspect Proof
                 </span>
               </div>
@@ -57,7 +57,7 @@ export default function CertificateGrid({ certificates, limit }: Props) {
 
             {/* Info details */}
             <div className="p-4 space-y-2">
-              <h4 className="text-base font-bold text-white group-hover:text-[#2962ff] transition-colors line-clamp-1">
+              <h4 className="text-base font-bold text-white group-hover:text-[#10b981] transition-colors line-clamp-1">
                 {cert.title}
               </h4>
               <div className="flex items-center justify-between text-xs text-[#787b86]">
@@ -99,7 +99,7 @@ export default function CertificateGrid({ certificates, limit }: Props) {
 
             {/* Header */}
             <div>
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#2962ff]/15 text-[#2962ff] border border-[#2962ff]/30">
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#10b981]/15 text-[#10b981] border border-[#10b981]/30">
                 {selectedCert.accountType}
               </span>
               <h3 className="text-xl font-bold text-white mt-2">

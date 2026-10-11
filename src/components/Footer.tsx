@@ -10,18 +10,18 @@ export default function Footer() {
           {/* Brand Info */}
           <div className="lg:col-span-2 space-y-4">
             <Link href="/" className="flex items-center gap-2.5">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#2962ff] text-white font-black shadow-sm">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#10b981] text-black font-black shadow-sm">
                 <TrendingUp className="h-4 w-4 stroke-[3]" />
               </div>
               <span className="text-xl font-bold tracking-tight text-white">
-                LearnFx<span className="text-[#2962ff]">Trade</span> India
+                LearnFx<span className="text-[#10b981]">Trade</span> India
               </span>
             </Link>
-            <p className="text-sm text-[#787b86] leading-relaxed max-w-sm">
+            <p className="text-sm text-white/70 leading-relaxed max-w-sm">
               Empowering Indian and global traders to master Institutional Forex Order Flow, Smart Money Concepts (SMC), and Nifty/BankNifty Price Action with proven risk management.
             </p>
-            <div className="pt-2 flex items-center gap-2 text-xs font-semibold text-[#d1d4dc]">
-              <span className="text-[#089981]">● Verified Funded Prop Trader</span>
+            <div className="pt-2 flex items-center gap-2 text-xs font-semibold text-white/80">
+              <span className="text-[#10b981]">● Verified Funded Prop Trader</span>
               <span>•</span>
               <span>100% Educational</span>
             </div>
@@ -34,27 +34,27 @@ export default function Footer() {
             </h3>
             <ul className="mt-4 space-y-2.5 text-sm">
               <li>
-                <Link href="/courses" className="hover:text-[#2962ff] transition-colors">
+                <Link href="/courses" className="hover:text-[#10b981] transition-colors">
                   All Courses
                 </Link>
               </li>
               <li>
-                <Link href="/courses/forex-smart-money-concepts-mastery" className="hover:text-[#2962ff] transition-colors">
+                <Link href="/courses/forex-smart-money-concepts-mastery" className="hover:text-[#10b981] transition-colors">
                   Forex SMC Mastery
                 </Link>
               </li>
               <li>
-                <Link href="/courses/indian-market-options-price-action-pro" className="hover:text-[#2962ff] transition-colors">
+                <Link href="/courses/indian-market-options-price-action-pro" className="hover:text-[#10b981] transition-colors">
                   Nifty & BankNifty Pro
                 </Link>
               </li>
               <li>
-                <Link href="/certificates" className="hover:text-[#2962ff] transition-colors">
+                <Link href="/certificates" className="hover:text-[#10b981] transition-colors">
                   Payout Proofs Gallery
                 </Link>
               </li>
               <li>
-                <Link href="/dashboard" className="hover:text-[#2962ff] transition-colors">
+                <Link href="/dashboard" className="hover:text-[#10b981] transition-colors">
                   Student Classroom
                 </Link>
               </li>
@@ -68,22 +68,22 @@ export default function Footer() {
             </h3>
             <ul className="mt-4 space-y-2.5 text-sm">
               <li>
-                <Link href="/contact" className="hover:text-[#2962ff] transition-colors">
+                <Link href="/contact" className="hover:text-[#10b981] transition-colors">
                   Help Desk & Contact
                 </Link>
               </li>
               <li>
-                <a href="https://t.me/" target="_blank" rel="noopener noreferrer" className="hover:text-[#2962ff] transition-colors inline-flex items-center gap-1">
+                <a href="https://t.me/" target="_blank" rel="noopener noreferrer" className="hover:text-[#10b981] transition-colors inline-flex items-center gap-1">
                   Telegram Channel <ArrowUpRight className="h-3 w-3" />
                 </a>
               </li>
               <li>
-                <a href="https://wa.me/" target="_blank" rel="noopener noreferrer" className="hover:text-[#2962ff] transition-colors inline-flex items-center gap-1">
+                <a href="https://wa.me/" target="_blank" rel="noopener noreferrer" className="hover:text-[#10b981] transition-colors inline-flex items-center gap-1">
                   WhatsApp Support <ArrowUpRight className="h-3 w-3" />
                 </a>
               </li>
               <li>
-                <Link href="/about" className="hover:text-[#2962ff] transition-colors">
+                <Link href="/about" className="hover:text-[#10b981] transition-colors">
                   Trading Track Record
                 </Link>
               </li>
@@ -97,17 +97,17 @@ export default function Footer() {
             </h3>
             <ul className="mt-4 space-y-2.5 text-sm">
               <li>
-                <Link href="/legal/terms" className="hover:text-[#2962ff] transition-colors">
+                <Link href="/legal/terms" className="hover:text-[#10b981] transition-colors">
                   Terms & Conditions
                 </Link>
               </li>
               <li>
-                <Link href="/legal/privacy" className="hover:text-[#2962ff] transition-colors">
+                <Link href="/legal/privacy" className="hover:text-[#10b981] transition-colors">
                   Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link href="/legal/refund" className="hover:text-[#2962ff] transition-colors">
+                <Link href="/legal/refund" className="hover:text-[#10b981] transition-colors">
                   Refund & Cancellation
                 </Link>
               </li>
