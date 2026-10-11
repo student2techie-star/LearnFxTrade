@@ -107,3 +107,20 @@ export interface OfflineBatch {
   enrolledStudents?: string[]; // Student names or IDs
 }
 
+export interface LiveSession {
+  id: string;
+  title: string;
+  topic: string;
+  category: 'Forex SMC' | 'Indian Market' | 'Psychology & Q&A';
+  scheduledDate: string; // e.g. "Tomorrow at 7:30 PM IST"
+  duration: string; // e.g. "90 mins"
+  priceInr: number; // 0 for free/included, or paid live pass
+  advanceFeeInr?: number; // Minimum advance booking fee to lock seat (remaining paid before live session)
+  hostMentor: string; // "Somnath"
+  platform: 'Zoom' | 'Google Meet' | 'YouTube Live';
+  totalSeats: number;
+  enrolledAttendees: string[]; // student names or emails
+  status: 'upcoming' | 'live_now' | 'completed';
+  recordingUrl?: string;
+  description?: string;
+}

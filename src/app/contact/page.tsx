@@ -70,6 +70,21 @@ export default function ContactPage() {
                 </div>
               </a>
 
+              <a
+                href="https://discord.gg/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3.5 p-3.5 rounded-2xl bg-[#5865F2]/10 hover:bg-[#5865F2]/20 border border-[#5865F2]/25 text-[#5865F2] transition"
+              >
+                <div className="p-2 rounded-xl bg-[#5865F2] text-white font-bold shrink-0">
+                  <MessageCircle className="h-5 w-5" />
+                </div>
+                <div>
+                  <div className="text-xs font-bold text-white">Discord Student Lounge</div>
+                  <div className="text-xs text-[#5865F2] font-mono">discord.gg/learnfxtrade</div>
+                </div>
+              </a>
+
               <div className="flex items-center gap-3.5 p-3.5 rounded-2xl bg-slate-800/50 border border-slate-700/60 text-slate-300">
                 <div className="p-2 rounded-xl bg-slate-700 text-white shrink-0">
                   <Mail className="h-5 w-5" />

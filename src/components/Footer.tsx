@@ -37,35 +37,32 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Quick Links */}
+          {/* Learning Programs & Tools */}
           <div>
             <h3 className="text-xs font-bold uppercase tracking-wider text-white">
-              Curriculum
+              Programs & Tools
             </h3>
             <ul className="mt-4 space-y-2.5 text-sm">
               <li>
-                <Link href="/courses" className="hover:text-[#10b981] transition-colors">
-                  All Courses
+                <Link href="/courses/recorded" className="hover:text-[#10b981] transition-colors">
+                  Recorded Classes
                 </Link>
               </li>
               <li>
-                <Link href="/courses/forex-smart-money-concepts-mastery" className="hover:text-[#10b981] transition-colors">
-                  Forex SMC Mastery
+                <Link href="/offline" className="hover:text-amber-400 transition-colors">
+                  Offline Classes
                 </Link>
               </li>
               <li>
-                <Link href="/courses/indian-market-options-price-action-pro" className="hover:text-[#10b981] transition-colors">
-                  Nifty & BankNifty Pro
+                <Link href="/live" className="text-rose-400 font-semibold hover:text-rose-300 transition-colors flex items-center gap-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-rose-500 animate-ping" />
+                  Live Sessions
                 </Link>
               </li>
               <li>
-                <Link href="/certificates" className="hover:text-[#10b981] transition-colors">
-                  Payout Proofs Gallery
-                </Link>
-              </li>
-              <li>
-                <Link href="/dashboard" className="hover:text-[#10b981] transition-colors">
-                  Student Classroom
+                <Link href="/forex-lot-calculator" className="text-emerald-400 font-semibold hover:text-emerald-300 transition-colors flex items-center gap-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  Lot Size Calculator
                 </Link>
               </li>
             </ul>
@@ -81,6 +78,11 @@ export default function Footer() {
                 <Link href="/contact" className="hover:text-[#10b981] transition-colors">
                   Help Desk & Contact
                 </Link>
+              </li>
+              <li>
+                <a href="https://discord.gg/" target="_blank" rel="noopener noreferrer" className="hover:text-[#5865F2] transition-colors inline-flex items-center gap-1">
+                  Discord Community <ArrowUpRight className="h-3 w-3" />
+                </a>
               </li>
               <li>
                 <a href="https://t.me/" target="_blank" rel="noopener noreferrer" className="hover:text-[#10b981] transition-colors inline-flex items-center gap-1">

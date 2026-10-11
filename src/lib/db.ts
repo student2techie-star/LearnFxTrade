@@ -1,4 +1,4 @@
-import { Course, Lesson, PayoutCertificate, User, Order, Enrollment, LessonProgress, OfflineBatch } from './types';
+import { Course, Lesson, PayoutCertificate, User, Order, Enrollment, LessonProgress, OfflineBatch, LiveSession } from './types';
 
 // Persistent local storage simulator for server routes and client side
 class DataStore {
@@ -10,6 +10,56 @@ class DataStore {
   private orders: Order[] = [];
   private progress: LessonProgress[] = [];
   private offlineBatches: OfflineBatch[] = [];
+  private liveSessions: LiveSession[] = [
+    {
+      id: 'live-london-smc',
+      title: 'London Open Live SMC Execution & Order Flow Breakdown',
+      topic: 'Live London session killzone analysis, liquidity pool run execution on EUR/USD & GBP/JPY with real-time entry triggers.',
+      category: 'Forex SMC',
+      scheduledDate: 'Tomorrow at 1:00 PM IST',
+      duration: '90 Mins',
+      priceInr: 1999,
+      advanceFeeInr: 499,
+      hostMentor: 'Somnath (Lead Trader)',
+      platform: 'Zoom',
+      totalSeats: 50,
+      enrolledAttendees: ['Arun Kumar', 'Pooja Venkatesh', 'Karthik R', 'Vignesh K'],
+      status: 'upcoming',
+      description: 'Live interactive screen share during the London open. Ask doubts directly, review charts together, and observe real-time order block validation.',
+    },
+    {
+      id: 'live-nifty-expiry',
+      title: 'Nifty & BankNifty Live Expiry Day Strategy Lab',
+      topic: 'Zero-to-Hero risk-controlled option buying setups, Open Interest trap identification, and CPR breakout timing.',
+      category: 'Indian Market',
+      scheduledDate: 'Thursday at 9:00 AM IST',
+      duration: '120 Mins',
+      priceInr: 1499,
+      advanceFeeInr: 399,
+      hostMentor: 'Somnath (Lead Trader)',
+      platform: 'Google Meet',
+      totalSeats: 40,
+      enrolledAttendees: ['Sanjay Narayanan', 'Divya Balaji', 'Rahul S'],
+      status: 'upcoming',
+      description: 'Live market execution during Indian market trading hours. Master theta management and high-momentum gamma bursts.',
+    },
+    {
+      id: 'live-propfirm-qa',
+      title: 'Prop Firm Evaluation AMA: Passing FTMO & Drawdown Rules',
+      topic: '1-on-1 portfolio desk review, psychology management under 5% daily drawdown, and payout extraction strategies.',
+      category: 'Psychology & Q&A',
+      scheduledDate: 'Saturday at 6:30 PM IST',
+      duration: '75 Mins',
+      priceInr: 999,
+      advanceFeeInr: 299,
+      hostMentor: 'Somnath (Lead Trader)',
+      platform: 'Zoom',
+      totalSeats: 60,
+      enrolledAttendees: ['Harish V', 'Meena Rajan'],
+      status: 'upcoming',
+      description: 'Interactive open floor Q&A session. Bring your recent trading journal for live trade critique and feedback.',
+    },
+  ];
 
 
   // Courses
@@ -262,6 +312,39 @@ class DataStore {
   resetOfflineBatches(): void {
     this.offlineBatches = [];
   }
+
+  // Live Trading Sessions
+  getLiveSessions(): LiveSession[] {
+    return this.liveSessions;
+  }
+
+  createLiveSession(session: Omit<LiveSession, 'id' | 'enrolledAttendees'>): LiveSession {
+    const newSession: LiveSession = {
+      ...session,
+      id: `live-${Date.now()}`,
+      enrolledAttendees: [],
+    };
+    this.liveSessions.unshift(newSession);
+    return newSession;
+  }
+
+  deleteLiveSession(id: string): boolean {
+    const initialLen = this.liveSessions.length;
+    this.liveSessions = this.liveSessions.filter(s => s.id !== id);
+    return this.liveSessions.length < initialLen;
+  }
+
+  enrollInLiveSession(sessionId: string, attendeeInfo: string): { success: boolean; session?: LiveSession; error?: string } {
+    const s = this.getLiveSessions().find(item => item.id === sessionId);
+    if (!s) return { success: false, error: 'Live session not found' };
+    if (s.enrolledAttendees.length >= s.totalSeats) {
+      return { success: false, error: 'Live session capacity is full!' };
+    }
+    if (!s.enrolledAttendees.includes(attendeeInfo)) {
+      s.enrolledAttendees.push(attendeeInfo);
+    }
+    return { success: true, session: s };
+  }
 }
 
 
@@ -273,7 +356,9 @@ declare global {
   var __LEARN_FX_STORE__: DataStore | undefined;
 }
 
-export const db: DataStore = global.__LEARN_FX_STORE__ || new DataStore();
-if (process.env.NODE_ENV !== 'production') {
-  global.__LEARN_FX_STORE__ = db;
+// Ensure the singleton has the latest class methods (prevents stale HMR prototype bugs)
+if (!global.__LEARN_FX_STORE__ || typeof (global.__LEARN_FX_STORE__ as any).createLiveSession !== 'function') {
+  global.__LEARN_FX_STORE__ = new DataStore();
 }
+
+export const db: DataStore = global.__LEARN_FX_STORE__;

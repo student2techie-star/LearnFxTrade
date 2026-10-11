@@ -26,7 +26,10 @@ import {
   UserCheck,
   Search,
   Filter,
+  Radio,
+  Video,
 } from 'lucide-react';
+import { LiveSession } from '@/lib/types';
 
 interface Course {
   id: string;
@@ -84,19 +87,41 @@ interface OfflineBatch {
 }
 
 export default function AdminPage() {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'courses' | 'certificates' | 'students' | 'offline' | 'offline_students' | 'orders'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'courses' | 'offline' | 'offline_students' | 'live_sessions' | 'live_students' | 'certificates' | 'students' | 'orders'>('dashboard');
   const [collapsed, setCollapsed] = useState(false);
   const [courses, setCourses] = useState<Course[]>([]);
   const [certificates, setCertificates] = useState<Certificate[]>([]);
   const [students, setStudents] = useState<Student[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [offlineBatches, setOfflineBatches] = useState<OfflineBatch[]>([]);
-  const [metrics, setMetrics] = useState({ revenue: 0, studentsCount: 0, coursesCount: 0, certsCount: 0, ordersCount: 0, batchesCount: 0 });
+  const [liveSessions, setLiveSessions] = useState<LiveSession[]>([]);
+  const [metrics, setMetrics] = useState({ revenue: 0, studentsCount: 0, coursesCount: 0, certsCount: 0, ordersCount: 0, batchesCount: 0, liveSessionsCount: 0 });
   const [loading, setLoading] = useState(true);
 
   // Offline Students Filter States
   const [selectedBatchDateFilter, setSelectedBatchDateFilter] = useState<string>('all');
   const [offlineStudentSearch, setOfflineStudentSearch] = useState<string>('');
+
+  // Live / Online Registered Students Filter States
+  const [selectedLiveSessionFilter, setSelectedLiveSessionFilter] = useState<string>('all');
+  const [liveStudentSearch, setLiveStudentSearch] = useState<string>('');
+
+  // Live Session Form State
+  const [liveSessionForm, setLiveSessionForm] = useState({
+    title: '',
+    topic: '',
+    category: 'Forex SMC' as 'Forex SMC' | 'Indian Market' | 'Psychology & Q&A',
+    scheduledDate: '', // Computed combined display string e.g. "Oct 15, 2026 at 7:30 PM IST"
+    dateInput: '', // HTML5 date picker YYYY-MM-DD
+    timeInput: '', // HTML5 time picker HH:MM
+    duration: '90 Mins',
+    priceInr: 1499,
+    advanceFeeInr: 399,
+    hostMentor: 'Somnath (Lead Trader)',
+    platform: 'Zoom' as 'Zoom' | 'Google Meet' | 'YouTube Live',
+    totalSeats: 100,
+    description: '',
+  });
 
   // New Offline Batch Form State
   const [batchForm, setBatchForm] = useState({
@@ -146,7 +171,7 @@ export default function AdminPage() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const res = await fetch('/api/admin/manage');
+      const res = await fetch('/api/admin/manage', { cache: 'no-store' });
       if (res.ok) {
         const d = await res.json();
         setCourses(d.courses || []);
@@ -154,6 +179,7 @@ export default function AdminPage() {
         setStudents(d.students || []);
         setOrders(d.orders || []);
         setOfflineBatches(d.offlineBatches || []);
+        setLiveSessions(d.liveSessions || []);
         setMetrics({
           revenue: d.metrics?.totalRevenue || 0,
           studentsCount: d.students?.length || 0,
@@ -161,6 +187,7 @@ export default function AdminPage() {
           certsCount: d.certificates?.length || 0,
           ordersCount: d.orders?.length || 0,
           batchesCount: d.offlineBatches?.length || 0,
+          liveSessionsCount: d.liveSessions?.length || 0,
         });
       }
     } catch (err) {
@@ -350,14 +377,109 @@ export default function AdminPage() {
     }
   };
 
+  // Create Live Session
+  const handleCreateLiveSession = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Compute formatted scheduled date from calendar and timer if provided
+    let finalScheduledDate = liveSessionForm.scheduledDate;
+    if (liveSessionForm.dateInput) {
+      const [year, month, day] = liveSessionForm.dateInput.split('-');
+      const d = new Date(Number(year), Number(month) - 1, Number(day));
+      const formattedDate = d.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      });
+
+      let formattedTime = '7:30 PM IST';
+      if (liveSessionForm.timeInput) {
+        const [hoursStr, minsStr] = liveSessionForm.timeInput.split(':');
+        let hours = Number(hoursStr);
+        const mins = minsStr;
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12 || 12;
+        formattedTime = `${hours}:${mins} ${ampm} IST`;
+      }
+      finalScheduledDate = `${formattedDate} at ${formattedTime}`;
+    }
+
+    if (!liveSessionForm.title || !finalScheduledDate) {
+      return alert('Session Title and Scheduled Date & Time are required');
+    }
+
+    try {
+      const res = await fetch('/api/live-sessions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'create',
+          ...liveSessionForm,
+          scheduledDate: finalScheduledDate,
+        }),
+      });
+      if (res.ok) {
+        alert('Live Session scheduled successfully!');
+        setLiveSessionForm({
+          title: '',
+          topic: '',
+          category: 'Forex SMC',
+          scheduledDate: '',
+          dateInput: '',
+          timeInput: '',
+          duration: '90 Mins',
+          priceInr: 1499,
+          advanceFeeInr: 399,
+          hostMentor: 'Somnath (Lead Trader)',
+          platform: 'Zoom',
+          totalSeats: 100,
+          description: '',
+        });
+        fetchData();
+      } else {
+        const d = await res.json();
+        alert(d.error || 'Failed to schedule live session');
+      }
+    } catch {
+      alert('Error scheduling live session');
+    }
+  };
+
+  // Delete Live Session
+  const handleDeleteLiveSession = async (sessionId: string) => {
+    if (!confirm('Are you sure you want to delete this live session?')) return;
+    try {
+      const res = await fetch('/api/live-sessions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'delete', sessionId }),
+      });
+      if (res.ok) {
+        alert('Live session deleted.');
+        fetchData();
+      } else {
+        alert('Failed to delete live session');
+      }
+    } catch {
+      alert('Error deleting live session');
+    }
+  };
+
   const totalOfflineAttendees = offlineBatches.reduce(
     (acc, b) => acc + (b.enrolledStudents ? b.enrolledStudents.length : b.bookedSeats),
     0
   );
 
+  const totalLiveAttendees = liveSessions.reduce(
+    (acc, s) => acc + (s.enrolledAttendees ? s.enrolledAttendees.length : 0),
+    0
+  );
+
   const navItems = [
     { key: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, count: null },
-    { key: 'courses', label: 'Courses', icon: BookOpen, count: courses.length },
+    { key: 'courses', label: 'Recorded Courses', icon: BookOpen, count: courses.length },
+    { key: 'live_sessions', label: 'Post Live Sessions', icon: Radio, count: liveSessions.length },
+    { key: 'live_students', label: 'Online Registered Students', icon: Users, count: totalLiveAttendees },
     { key: 'offline', label: 'Offline Batches', icon: MapPin, count: offlineBatches.length },
     { key: 'offline_students', label: 'Offline Registered Students', icon: UserCheck, count: totalOfflineAttendees },
     { key: 'certificates', label: 'Certificates', icon: Award, count: certificates.length },
@@ -451,8 +573,12 @@ export default function AdminPage() {
         <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-[#222222] bg-black/95 px-6 backdrop-blur-md">
           <div className="flex items-center gap-2">
             <h1 className="text-base font-extrabold text-white capitalize">
-              {activeTab === 'dashboard' && 'Dashboard Overview'}
-              {activeTab === 'courses' && 'Manage Courses'}
+              {activeTab === 'dashboard' && 'Admin Overview'}
+              {activeTab === 'courses' && 'Manage Recorded Classes'}
+              {activeTab === 'live_sessions' && 'Post & Manage Live Sessions'}
+              {activeTab === 'live_students' && 'Online Registered Students Roster'}
+              {activeTab === 'offline' && 'Manage Offline Batches'}
+              {activeTab === 'offline_students' && 'Offline Registered Students'}
               {activeTab === 'certificates' && 'Manage Payout Certificates'}
               {activeTab === 'students' && 'Manage Student Access'}
               {activeTab === 'orders' && 'Orders & Payments'}
@@ -475,13 +601,13 @@ export default function AdminPage() {
           {activeTab === 'dashboard' && (
             <div className="space-y-6">
               {/* Stat Cards */}
-              <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-6 gap-3">
                 <div className="p-4 rounded-2xl border border-[#222222] bg-[#111111] space-y-1">
                   <div className="text-xs text-[#a1a1aa] font-semibold flex items-center justify-between">
                     <span>Revenue</span>
                     <DollarSign className="h-4 w-4 text-[#10b981]" />
                   </div>
-                  <div className="text-xl sm:text-2xl font-black text-white font-mono">
+                  <div className="text-lg sm:text-xl font-black text-white font-mono">
                     ₹{metrics.revenue.toLocaleString('en-IN')}
                   </div>
                   <div className="text-[10px] text-[#10b981]">Razorpay Gateway</div>
@@ -489,11 +615,20 @@ export default function AdminPage() {
 
                 <div className="p-4 rounded-2xl border border-[#222222] bg-[#111111] space-y-1">
                   <div className="text-xs text-[#a1a1aa] font-semibold flex items-center justify-between">
-                    <span>Online Courses</span>
+                    <span>Recorded</span>
                     <BookOpen className="h-4 w-4 text-[#10b981]" />
                   </div>
-                  <div className="text-xl sm:text-2xl font-black text-white font-mono">{metrics.coursesCount}</div>
-                  <div className="text-[10px] text-[#a1a1aa]">Recorded video access</div>
+                  <div className="text-lg sm:text-xl font-black text-white font-mono">{metrics.coursesCount}</div>
+                  <div className="text-[10px] text-[#a1a1aa]">Video classes</div>
+                </div>
+
+                <div className="p-4 rounded-2xl border border-[#222222] bg-[#111111] space-y-1">
+                  <div className="text-xs text-[#a1a1aa] font-semibold flex items-center justify-between">
+                    <span>Live Sessions</span>
+                    <Radio className="h-4 w-4 text-rose-500" />
+                  </div>
+                  <div className="text-lg sm:text-xl font-black text-white font-mono">{liveSessions.length}</div>
+                  <div className="text-[10px] text-rose-400 font-bold">{totalLiveAttendees} attendees</div>
                 </div>
 
                 <div className="p-4 rounded-2xl border border-[#222222] bg-[#111111] space-y-1">
@@ -501,8 +636,8 @@ export default function AdminPage() {
                     <span>Offline Batches</span>
                     <MapPin className="h-4 w-4 text-[#10b981]" />
                   </div>
-                  <div className="text-xl sm:text-2xl font-black text-white font-mono">{offlineBatches.length}</div>
-                  <div className="text-[10px] text-[#10b981]">Classroom / In-Person</div>
+                  <div className="text-lg sm:text-xl font-black text-white font-mono">{offlineBatches.length}</div>
+                  <div className="text-[10px] text-[#10b981]">{totalOfflineAttendees} booked</div>
                 </div>
 
                 <div className="p-4 rounded-2xl border border-[#222222] bg-[#111111] space-y-1">
@@ -510,7 +645,7 @@ export default function AdminPage() {
                     <span>Certificates</span>
                     <Award className="h-4 w-4 text-[#10b981]" />
                   </div>
-                  <div className="text-xl sm:text-2xl font-black text-white font-mono">{metrics.certsCount}</div>
+                  <div className="text-lg sm:text-xl font-black text-white font-mono">{metrics.certsCount}</div>
                   <div className="text-[10px] text-[#a1a1aa]">Payout proofs</div>
                 </div>
 
@@ -519,7 +654,7 @@ export default function AdminPage() {
                     <span>Students</span>
                     <Users className="h-4 w-4 text-[#10b981]" />
                   </div>
-                  <div className="text-xl sm:text-2xl font-black text-white font-mono">{metrics.studentsCount}</div>
+                  <div className="text-lg sm:text-xl font-black text-white font-mono">{metrics.studentsCount}</div>
                   <div className="text-[10px] text-[#a1a1aa]">Active learners</div>
                 </div>
               </div>
@@ -531,8 +666,26 @@ export default function AdminPage() {
                   className="p-4 rounded-2xl border border-[#222222] bg-[#111111] hover:border-[#10b981] transition text-left space-y-2 cursor-pointer"
                 >
                   <BookOpen className="h-5 w-5 text-[#10b981]" />
-                  <div className="text-sm font-bold text-white">Online Courses</div>
-                  <div className="text-xs text-[#a1a1aa]">Upload course thumbnails from PC & set prices</div>
+                  <div className="text-sm font-bold text-white">Recorded Classes</div>
+                  <div className="text-xs text-[#a1a1aa]">Manage video masterclass modules & pricing</div>
+                </button>
+
+                <button
+                  onClick={() => setActiveTab('live_sessions')}
+                  className="p-4 rounded-2xl border border-[#222222] bg-[#111111] hover:border-rose-500 transition text-left space-y-2 cursor-pointer"
+                >
+                  <Radio className="h-5 w-5 text-rose-500" />
+                  <div className="text-sm font-bold text-white">Post Live Sessions</div>
+                  <div className="text-xs text-[#a1a1aa]">Schedule market streams on Zoom & Meet</div>
+                </button>
+
+                <button
+                  onClick={() => setActiveTab('live_students')}
+                  className="p-4 rounded-2xl border border-[#222222] bg-[#111111] hover:border-rose-400 transition text-left space-y-2 cursor-pointer"
+                >
+                  <Users className="h-5 w-5 text-rose-400" />
+                  <div className="text-sm font-bold text-white">Online Registered Students</div>
+                  <div className="text-xs text-[#a1a1aa]">View & filter enrolled live attendees ({totalLiveAttendees})</div>
                 </button>
 
                 <button
@@ -1418,6 +1571,451 @@ export default function AdminPage() {
                             <div className="p-8 text-center text-xs text-[#a1a1aa]">
                               {allAttendees.length === 0
                                 ? 'No student bookings registered for this batch yet.'
+                                : 'No students found matching your search query.'}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
+            </div>
+          )}
+
+          {/* TAB: POST LIVE SESSIONS */}
+          {activeTab === 'live_sessions' && (
+            <div className="space-y-6">
+              {/* Header Banner */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-2xl bg-gradient-to-r from-[#140f10] via-[#0c0c0e] to-[#0d1612] border border-[#222222]">
+                <div>
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-400 text-xs font-bold mb-2">
+                    <Radio className="h-3.5 w-3.5 animate-pulse" /> Live Webinar Creator
+                  </div>
+                  <h2 className="text-xl font-black text-white">Post & Schedule Live Sessions</h2>
+                  <p className="text-xs text-[#a1a1aa] mt-1">
+                    Create upcoming live trading floor streams on Zoom, Google Meet, or YouTube Live.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-4 bg-black/80 px-4 py-3 rounded-xl border border-[#222222]">
+                  <div>
+                    <div className="text-xl font-black text-white font-mono">{liveSessions.length}</div>
+                    <div className="text-[10px] text-[#a1a1aa]">Total Sessions</div>
+                  </div>
+                  <div className="h-8 w-px bg-[#222222]" />
+                  <button
+                    onClick={() => setActiveTab('live_students')}
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#10b981]/20 border border-[#10b981]/30 text-[#10b981] hover:bg-[#10b981]/30 transition text-xs font-bold cursor-pointer"
+                  >
+                    <Users className="h-3.5 w-3.5" />
+                    <span>View {totalLiveAttendees} Enrolled Students →</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Schedule New Live Session Form */}
+              <div className="rounded-2xl border border-[#222222] bg-[#0c0c0e] p-6 space-y-4 shadow-xl">
+                <div className="flex items-center gap-2">
+                  <div className="h-7 w-7 rounded-lg bg-[#10b981]/20 text-[#10b981] flex items-center justify-center font-bold">
+                    <Plus className="h-4 w-4" />
+                  </div>
+                  <h3 className="text-base font-bold text-white">Schedule New Live Session</h3>
+                </div>
+
+                <form onSubmit={handleCreateLiveSession} className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold text-[#a1a1aa] uppercase mb-1">Session Title *</label>
+                      <input
+                        type="text"
+                        required
+                        value={liveSessionForm.title}
+                        onChange={(e) => setLiveSessionForm({ ...liveSessionForm, title: e.target.value })}
+                        placeholder="e.g. London Open Live SMC Execution"
+                        className="w-full px-3 py-2 rounded-xl bg-[#141416] border border-[#222222] text-xs text-white focus:outline-none focus:border-[#10b981]"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-[#a1a1aa] uppercase mb-1">Category</label>
+                      <select
+                        value={liveSessionForm.category}
+                        onChange={(e) => setLiveSessionForm({ ...liveSessionForm, category: e.target.value as any })}
+                        className="w-full px-3 py-2 rounded-xl bg-[#141416] border border-[#222222] text-xs text-white focus:outline-none focus:border-[#10b981]"
+                      >
+                        <option value="Forex SMC">Forex SMC</option>
+                        <option value="Indian Market">Indian Market</option>
+                        <option value="Psychology & Q&A">Psychology & Q&A</option>
+                      </select>
+                    </div>
+
+                    {/* Interactive Calendar Date Picker */}
+                    <div>
+                      <label className="block text-xs font-bold text-[#a1a1aa] uppercase mb-1 flex items-center gap-1.5">
+                        <Calendar className="h-3.5 w-3.5 text-[#10b981]" />
+                        <span>Schedule Date (Calendar) *</span>
+                      </label>
+                      <input
+                        type="date"
+                        required
+                        value={liveSessionForm.dateInput}
+                        onChange={(e) => setLiveSessionForm({ ...liveSessionForm, dateInput: e.target.value })}
+                        className="w-full px-3 py-2 rounded-xl bg-[#141416] border border-[#222222] text-xs text-white focus:outline-none focus:border-[#10b981] [color-scheme:dark]"
+                      />
+                    </div>
+
+                    {/* Interactive Timer Time Picker */}
+                    <div>
+                      <label className="block text-xs font-bold text-[#a1a1aa] uppercase mb-1 flex items-center gap-1.5">
+                        <Clock className="h-3.5 w-3.5 text-cyan-400" />
+                        <span>Start Time (Timer) *</span>
+                      </label>
+                      <input
+                        type="time"
+                        required
+                        value={liveSessionForm.timeInput}
+                        onChange={(e) => setLiveSessionForm({ ...liveSessionForm, timeInput: e.target.value })}
+                        className="w-full px-3 py-2 rounded-xl bg-[#141416] border border-[#222222] text-xs text-white focus:outline-none focus:border-[#10b981] [color-scheme:dark]"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-[#a1a1aa] uppercase mb-1">Duration</label>
+                      <input
+                        type="text"
+                        value={liveSessionForm.duration}
+                        onChange={(e) => setLiveSessionForm({ ...liveSessionForm, duration: e.target.value })}
+                        placeholder="e.g. 90 Mins"
+                        className="w-full px-3 py-2 rounded-xl bg-[#141416] border border-[#222222] text-xs text-white focus:outline-none focus:border-[#10b981]"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-[#a1a1aa] uppercase mb-1">Platform</label>
+                      <select
+                        value={liveSessionForm.platform}
+                        onChange={(e) => setLiveSessionForm({ ...liveSessionForm, platform: e.target.value as any })}
+                        className="w-full px-3 py-2 rounded-xl bg-[#141416] border border-[#222222] text-xs text-white focus:outline-none focus:border-[#10b981]"
+                      >
+                        <option value="Zoom">Zoom</option>
+                        <option value="Google Meet">Google Meet</option>
+                        <option value="YouTube Live">YouTube Live</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-[#a1a1aa] uppercase mb-1">Total Fee (₹ INR) *</label>
+                      <input
+                        type="number"
+                        required
+                        value={liveSessionForm.priceInr}
+                        onChange={(e) => setLiveSessionForm({ ...liveSessionForm, priceInr: Number(e.target.value) })}
+                        placeholder="1499"
+                        className="w-full px-3 py-2 rounded-xl bg-[#141416] border border-[#222222] text-xs text-white focus:outline-none focus:border-[#10b981]"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-[#a1a1aa] uppercase mb-1 flex items-center justify-between">
+                        <span>Advance Fee (₹ INR) *</span>
+                        <span className="text-[10px] text-emerald-400 font-normal">To lock seat now</span>
+                      </label>
+                      <input
+                        type="number"
+                        required
+                        value={liveSessionForm.advanceFeeInr}
+                        onChange={(e) => setLiveSessionForm({ ...liveSessionForm, advanceFeeInr: Number(e.target.value) })}
+                        placeholder="399"
+                        className="w-full px-3 py-2 rounded-xl bg-[#141416] border border-[#222222] text-xs text-white focus:outline-none focus:border-[#10b981]"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-[#a1a1aa] uppercase mb-1">Total Seat Quota</label>
+                      <input
+                        type="number"
+                        value={liveSessionForm.totalSeats}
+                        onChange={(e) => setLiveSessionForm({ ...liveSessionForm, totalSeats: Number(e.target.value) })}
+                        placeholder="100"
+                        className="w-full px-3 py-2 rounded-xl bg-[#141416] border border-[#222222] text-xs text-white focus:outline-none focus:border-[#10b981]"
+                      />
+                    </div>
+
+                    <div className="sm:col-span-2">
+                      <label className="block text-xs font-bold text-[#a1a1aa] uppercase mb-1">Session Topic & Objectives</label>
+                      <input
+                        type="text"
+                        value={liveSessionForm.topic}
+                        onChange={(e) => setLiveSessionForm({ ...liveSessionForm, topic: e.target.value })}
+                        placeholder="e.g. Real-time EUR/USD liquidity sweeps, live chart markups and entry executions."
+                        className="w-full px-3 py-2 rounded-xl bg-[#141416] border border-[#222222] text-xs text-white focus:outline-none focus:border-[#10b981]"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end pt-2">
+                    <button
+                      type="submit"
+                      className="px-5 py-2.5 rounded-xl bg-[#10b981] hover:bg-[#059669] text-black font-extrabold text-xs transition cursor-pointer flex items-center gap-2 shadow-md shadow-[#10b981]/20"
+                    >
+                      <Plus className="h-4 w-4" /> Publish Live Session
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+              {/* Published Live Sessions List */}
+              <div className="space-y-4">
+                <h3 className="text-base font-bold text-white flex items-center gap-2">
+                  <Radio className="h-4 w-4 text-rose-500" />
+                  Currently Published Live Sessions
+                </h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {liveSessions.map((session) => {
+                    const attendees = session.enrolledAttendees || [];
+                    const seatsLeft = Math.max(0, session.totalSeats - attendees.length);
+
+                    return (
+                      <div
+                        key={session.id}
+                        className="rounded-2xl border border-[#222222] bg-[#0c0c0e] p-5 space-y-4 flex flex-col justify-between shadow-lg"
+                      >
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/30">
+                              {session.category}
+                            </span>
+                            <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-[#1a1a1d] text-cyan-400 border border-[#222222]">
+                              {session.platform}
+                            </span>
+                          </div>
+                          <h4 className="text-base font-bold text-white">{session.title}</h4>
+                          <p className="text-xs text-[#a1a1aa] line-clamp-2">{session.topic}</p>
+                          <div className="text-xs text-[#a1a1aa] pt-1">
+                            📅 <strong className="text-white">{session.scheduledDate}</strong> • ⏱️ {session.duration}
+                          </div>
+                        </div>
+
+                        <div className="pt-3 border-t border-[#1e1e22] flex items-center justify-between text-xs">
+                          <div className="space-y-0.5">
+                            <div className="font-mono text-white">
+                              <strong className="text-[#10b981]">{attendees.length}</strong> / {session.totalSeats} Enrolled
+                            </div>
+                            <div className="text-[11px] text-[#a1a1aa] font-mono">
+                              Total: <span className="text-white font-bold">₹{session.priceInr || 0}</span>
+                              {session.advanceFeeInr ? (
+                                <span className="text-emerald-400 ml-1.5 font-semibold">
+                                  (Advance: ₹{session.advanceFeeInr})
+                                </span>
+                              ) : null}
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <button
+                              onClick={() => handleDeleteLiveSession(session.id)}
+                              className="text-[#a1a1aa] hover:text-rose-400 transition p-1 rounded cursor-pointer"
+                              title="Delete Session"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                            <button
+                              onClick={() => {
+                                setSelectedLiveSessionFilter(session.id);
+                                setActiveTab('live_students');
+                              }}
+                              className="text-[#10b981] hover:underline font-bold text-xs flex items-center gap-1 cursor-pointer"
+                            >
+                              <span>Inspect ({attendees.length})</span>
+                              <span>→</span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB: SEPARATE ONLINE REGISTERED STUDENTS PAGE */}
+          {activeTab === 'live_students' && (
+            <div className="space-y-6">
+              {/* Header & Filter Controls Bar */}
+              <div className="rounded-2xl border border-[#222222] bg-[#111111] p-6 space-y-4">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#222222] pb-4">
+                  <div>
+                    <h2 className="text-base font-bold text-white flex items-center gap-2">
+                      <Users className="h-5 w-5 text-rose-500" /> Online Registered Students (Live Sessions)
+                    </h2>
+                    <p className="text-xs text-[#a1a1aa] mt-0.5">
+                      Dedicated attendee roster for all online live session registrations. Filter by specific live class or search students.
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <span className="px-3 py-1 rounded-lg text-xs font-bold bg-rose-500/15 text-rose-400 border border-rose-500/30">
+                      Total Live Attendees: {totalLiveAttendees}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Filter and Search Bar */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
+                  {/* Session Filter Dropdown */}
+                  <div className="space-y-1">
+                    <label className="text-xs text-[#a1a1aa] font-semibold flex items-center gap-1.5">
+                      <Filter className="h-3.5 w-3.5 text-rose-500" /> Filter by Live Session:
+                    </label>
+                    <select
+                      value={selectedLiveSessionFilter}
+                      onChange={(e) => setSelectedLiveSessionFilter(e.target.value)}
+                      className="w-full p-2.5 rounded-xl bg-black border border-[#222222] text-xs font-semibold text-white focus:border-rose-500 focus:outline-none"
+                    >
+                      <option value="all">All Live Sessions ({liveSessions.length})</option>
+                      {liveSessions.map((s) => (
+                        <option key={s.id} value={s.id}>
+                          {s.title} ({s.enrolledAttendees?.length || 0} students)
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Student Search */}
+                  <div className="space-y-1 md:col-span-2">
+                    <label className="text-xs text-[#a1a1aa] font-semibold flex items-center gap-1.5">
+                      <Search className="h-3.5 w-3.5 text-rose-500" /> Search Online Student Name / Email / Phone:
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        placeholder="Search student name, email, or contact info..."
+                        value={liveStudentSearch}
+                        onChange={(e) => setLiveStudentSearch(e.target.value)}
+                        className="w-full p-2.5 pl-9 rounded-xl bg-black border border-[#222222] text-xs text-white placeholder-[#71717a] focus:border-rose-500 focus:outline-none"
+                      />
+                      <Search className="absolute left-3 top-3 h-3.5 w-3.5 text-[#71717a]" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Sessions & Students Table */}
+              {(() => {
+                const filteredSessions = liveSessions.filter((s) => {
+                  if (selectedLiveSessionFilter !== 'all' && s.id !== selectedLiveSessionFilter) {
+                    return false;
+                  }
+                  return true;
+                });
+
+                if (filteredSessions.length === 0) {
+                  return (
+                    <div className="rounded-2xl border border-[#222222] bg-[#111111] p-12 text-center text-xs text-[#a1a1aa]">
+                      No live sessions found matching the selected filter.
+                    </div>
+                  );
+                }
+
+                return (
+                  <div className="space-y-6">
+                    {filteredSessions.map((session) => {
+                      const allAttendees = session.enrolledAttendees || [];
+                      const filteredAttendees = allAttendees.filter((studentStr) =>
+                        studentStr.toLowerCase().includes(liveStudentSearch.toLowerCase())
+                      );
+
+                      return (
+                        <div
+                          key={session.id}
+                          className="rounded-2xl border border-[#222222] bg-[#111111] overflow-hidden"
+                        >
+                          {/* Session Header Bar */}
+                          <div className="bg-[#141416] p-4 sm:p-5 border-b border-[#222222] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div className="space-y-1">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/30">
+                                  {session.category}
+                                </span>
+                                <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-[#1a1a1d] text-cyan-400 border border-[#222222]">
+                                  {session.platform}
+                                </span>
+                                <span className="text-xs text-[#a1a1aa]">• {session.scheduledDate}</span>
+                              </div>
+                              <h3 className="text-base font-bold text-white">{session.title}</h3>
+                              <p className="text-xs text-[#a1a1aa]">{session.topic}</p>
+                            </div>
+
+                            <div className="flex items-center gap-4 bg-black/60 p-3 rounded-xl border border-[#222222] shrink-0 self-start sm:self-auto">
+                              <div>
+                                <div className="text-lg font-black text-white font-mono">
+                                  {allAttendees.length} / {session.totalSeats}
+                                </div>
+                                <div className="text-[10px] text-[#a1a1aa]">Seats Enrolled</div>
+                              </div>
+                              <div className="h-7 w-px bg-[#222222]" />
+                              <div>
+                                <div className="text-lg font-black text-[#10b981] font-mono">
+                                  {Math.max(0, session.totalSeats - allAttendees.length)}
+                                </div>
+                                <div className="text-[10px] text-[#a1a1aa]">Seats Left</div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Student Attendees List Table */}
+                          {filteredAttendees.length > 0 ? (
+                            <div className="overflow-x-auto">
+                              <table className="w-full text-left text-xs">
+                                <thead>
+                                  <tr className="border-b border-[#222222] bg-black/40 text-[10px] font-bold text-[#a1a1aa] uppercase tracking-wider">
+                                    <th className="px-5 py-3 w-12">#</th>
+                                    <th className="px-5 py-3">Student Name</th>
+                                    <th className="px-5 py-3">Registered Contact Info</th>
+                                    <th className="px-5 py-3">Live Session Timing</th>
+                                    <th className="px-5 py-3">Platform & Link Status</th>
+                                  </tr>
+                                </thead>
+                                <tbody className="divide-y divide-[#1e1e22]">
+                                  {filteredAttendees.map((rawName, idx) => {
+                                    const match = rawName.match(/^(.*?)\s*\((.*?)\)$/);
+                                    const studentName = match ? match[1].trim() : rawName;
+                                    const studentContact = match ? match[2].trim() : 'Registered on Live Page';
+
+                                    return (
+                                      <tr key={idx} className="hover:bg-[#141416] transition">
+                                        <td className="px-5 py-3.5 text-[#71717a] font-mono font-bold">
+                                          {idx + 1}
+                                        </td>
+                                        <td className="px-5 py-3.5 font-bold text-white flex items-center gap-2">
+                                          <div className="h-7 w-7 rounded-full bg-rose-500/20 border border-rose-500/30 text-rose-400 flex items-center justify-center font-black text-[11px]">
+                                            {studentName.charAt(0).toUpperCase()}
+                                          </div>
+                                          <span>{studentName}</span>
+                                        </td>
+                                        <td className="px-5 py-3.5 text-slate-300 font-mono text-[11px]">
+                                          {studentContact}
+                                        </td>
+                                        <td className="px-5 py-3.5 text-[#a1a1aa]">
+                                          <span className="font-semibold text-white">{session.scheduledDate}</span>
+                                        </td>
+                                        <td className="px-5 py-3.5">
+                                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#10b981]/15 text-[#10b981] border border-[#10b981]/30">
+                                            <CheckCircle className="h-3 w-3" /> {session.platform} Pass Active
+                                          </span>
+                                        </td>
+                                      </tr>
+                                    );
+                                  })}
+                                </tbody>
+                              </table>
+                            </div>
+                          ) : (
+                            <div className="p-8 text-center text-xs text-[#a1a1aa]">
+                              {allAttendees.length === 0
+                                ? 'No online students registered for this live session yet.'
                                 : 'No students found matching your search query.'}
                             </div>
                           )}

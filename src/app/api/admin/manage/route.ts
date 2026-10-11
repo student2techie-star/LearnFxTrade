@@ -37,6 +37,7 @@ export async function GET() {
       certificatesCount: db.getAllCertificatesAdmin().length,
       lessonsCount: lessons.length,
       offlineBatchesCount: db.getOfflineBatches().length,
+      liveSessionsCount: db.getLiveSessions().length,
     },
     students: studentsList,
     orders,
@@ -44,6 +45,7 @@ export async function GET() {
     lessons,
     certificates: db.getAllCertificatesAdmin(),
     offlineBatches: db.getOfflineBatches(),
+    liveSessions: db.getLiveSessions(),
   });
 }
 

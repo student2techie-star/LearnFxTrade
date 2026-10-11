@@ -104,6 +104,25 @@ CREATE TABLE IF NOT EXISTS public.orders (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- 8. Live Interactive Trading Sessions Table
+CREATE TABLE IF NOT EXISTS public.live_sessions (
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  topic TEXT DEFAULT '',
+  category TEXT DEFAULT 'Forex SMC',
+  scheduled_date TEXT NOT NULL,
+  duration TEXT DEFAULT '90 Mins',
+  price_inr NUMERIC DEFAULT 0,
+  advance_fee_inr NUMERIC DEFAULT 0,
+  host_mentor TEXT DEFAULT 'Somnath (Lead Trader)',
+  platform TEXT DEFAULT 'Zoom',
+  total_seats INTEGER DEFAULT 100,
+  enrolled_attendees TEXT[] DEFAULT ARRAY[]::TEXT[],
+  status TEXT DEFAULT 'upcoming',
+  description TEXT DEFAULT '',
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- ==============================================================================
 -- Row Level Security (RLS) Setup
 -- ==============================================================================
@@ -114,6 +133,7 @@ ALTER TABLE public.enrollments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.certificates ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.offline_batches ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.live_sessions ENABLE ROW LEVEL SECURITY;
 
 -- Drop any previous policies to allow clean re-runs
 DROP POLICY IF EXISTS "Public read courses" ON public.courses;
@@ -125,6 +145,8 @@ DROP POLICY IF EXISTS "Admin write certificates" ON public.certificates;
 DROP POLICY IF EXISTS "Public read offline batches" ON public.offline_batches;
 DROP POLICY IF EXISTS "Public update offline batches" ON public.offline_batches;
 DROP POLICY IF EXISTS "Admin write offline batches" ON public.offline_batches;
+DROP POLICY IF EXISTS "Public read live sessions" ON public.live_sessions;
+DROP POLICY IF EXISTS "Admin write live sessions" ON public.live_sessions;
 DROP POLICY IF EXISTS "Public read users" ON public.users;
 DROP POLICY IF EXISTS "Public insert users" ON public.users;
 DROP POLICY IF EXISTS "Admin write users" ON public.users;
@@ -150,7 +172,11 @@ CREATE POLICY "Public read offline batches" ON public.offline_batches FOR SELECT
 CREATE POLICY "Public update offline batches" ON public.offline_batches FOR UPDATE USING (true) WITH CHECK (true);
 CREATE POLICY "Admin write offline batches" ON public.offline_batches FOR ALL USING (true) WITH CHECK (true);
 
--- 4. Users, Enrollments & Orders: Read & Insert allowed
+-- 4. Live Sessions: Everyone can view & enroll
+CREATE POLICY "Public read live sessions" ON public.live_sessions FOR SELECT USING (true);
+CREATE POLICY "Admin write live sessions" ON public.live_sessions FOR ALL USING (true) WITH CHECK (true);
+
+-- 5. Users, Enrollments & Orders: Read & Insert allowed
 CREATE POLICY "Public read users" ON public.users FOR SELECT USING (true);
 CREATE POLICY "Public insert users" ON public.users FOR INSERT WITH CHECK (true);
 CREATE POLICY "Admin write users" ON public.users FOR ALL USING (true) WITH CHECK (true);
