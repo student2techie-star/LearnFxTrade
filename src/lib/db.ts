@@ -1,5 +1,39 @@
-import { Course, Lesson, PayoutCertificate, User, Order, Enrollment, LessonProgress } from './types';
+import { Course, Lesson, PayoutCertificate, User, Order, Enrollment, LessonProgress, OfflineBatch } from './types';
 import { INITIAL_COURSES, INITIAL_LESSONS, INITIAL_CERTIFICATES, INITIAL_USERS, INITIAL_ENROLLMENTS, INITIAL_ORDERS } from './mock-data';
+
+// Initial sample offline batches for India
+const INITIAL_OFFLINE_BATCHES: OfflineBatch[] = [
+  {
+    id: 'batch-blr-01',
+    title: '3-Day Institutional SMC Boot Camp',
+    city: 'Bengaluru',
+    venue: 'The Leela Palace / Indiranagar Trading Hub',
+    startDate: 'Nov 14, 2026',
+    endDate: 'Nov 16, 2026',
+    timing: '9:30 AM - 5:30 PM IST',
+    priceInr: 14999,
+    totalSeats: 25,
+    bookedSeats: 18,
+    status: 'upcoming',
+    notes: 'Includes live London session order flow trading + 1-on-1 drawdown strategy review.',
+    enrolledStudents: ['Rahul Sharma', 'Ananya Patel', 'Karan Mehta'],
+  },
+  {
+    id: 'batch-mum-02',
+    title: 'Nifty & BankNifty Price Action Live Trading Floor',
+    city: 'Mumbai',
+    venue: 'Bandra Kurla Complex (BKC) Executive Center',
+    startDate: 'Dec 05, 2026',
+    endDate: 'Dec 07, 2026',
+    timing: '9:00 AM - 4:30 PM IST',
+    priceInr: 16999,
+    totalSeats: 30,
+    bookedSeats: 24,
+    status: 'upcoming',
+    notes: 'Live market execution during Indian market trading hours with mentor on large screens.',
+    enrolledStudents: ['Vikram Singh', 'Pooja Iyer'],
+  },
+];
 
 // Persistent local storage simulator for server routes and client side
 class DataStore {
@@ -10,6 +44,8 @@ class DataStore {
   private enrollments: Enrollment[] = [...INITIAL_ENROLLMENTS];
   private orders: Order[] = [...INITIAL_ORDERS];
   private progress: LessonProgress[] = [];
+  private offlineBatches: OfflineBatch[] = [...INITIAL_OFFLINE_BATCHES];
+
 
   // Courses
   getCourses(): Course[] {
@@ -216,7 +252,36 @@ class DataStore {
       .filter(p => p.userId === userId && p.courseId === courseId && p.completed)
       .map(p => p.lessonId);
   }
+
+  // Offline Classes & Batches
+  getOfflineBatches(): OfflineBatch[] {
+    return this.offlineBatches;
+  }
+
+  createOfflineBatch(batch: Omit<OfflineBatch, 'id'>): OfflineBatch {
+    const newBatch: OfflineBatch = {
+      ...batch,
+      id: `batch-${Date.now()}`,
+    };
+    this.offlineBatches.unshift(newBatch);
+    return newBatch;
+  }
+
+  deleteOfflineBatch(id: string): boolean {
+    const initialLen = this.offlineBatches.length;
+    this.offlineBatches = this.offlineBatches.filter(b => b.id !== id);
+    return this.offlineBatches.length < initialLen;
+  }
+
+  updateOfflineBatchSeats(id: string, delta: number): OfflineBatch | null {
+    const b = this.offlineBatches.find(batch => batch.id === id);
+    if (!b) return null;
+    b.bookedSeats = Math.max(0, Math.min(b.totalSeats, b.bookedSeats + delta));
+    if (b.bookedSeats >= b.totalSeats) b.status = 'sold_out';
+    return b;
+  }
 }
+
 
 // Global singleton instance so memory is shared across server route hits
 declare global {

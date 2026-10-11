@@ -20,6 +20,9 @@ import {
   ChevronLeft,
   ChevronRight,
   TrendingUp,
+  MapPin,
+  Calendar,
+  Clock,
 } from 'lucide-react';
 
 interface Course {
@@ -60,15 +63,46 @@ interface Order {
   createdAt: string;
 }
 
+interface OfflineBatch {
+  id: string;
+  title: string;
+  city: string;
+  venue: string;
+  startDate: string;
+  endDate: string;
+  timing: string;
+  priceInr: number;
+  totalSeats: number;
+  bookedSeats: number;
+  status: 'upcoming' | 'ongoing' | 'completed' | 'sold_out';
+  notes?: string;
+  enrolledStudents?: string[];
+}
+
 export default function AdminPage() {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'courses' | 'certificates' | 'students' | 'orders'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'courses' | 'certificates' | 'students' | 'offline' | 'orders'>('dashboard');
   const [collapsed, setCollapsed] = useState(false);
   const [courses, setCourses] = useState<Course[]>([]);
   const [certificates, setCertificates] = useState<Certificate[]>([]);
   const [students, setStudents] = useState<Student[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
-  const [metrics, setMetrics] = useState({ revenue: 0, studentsCount: 0, coursesCount: 0, certsCount: 0, ordersCount: 0 });
+  const [offlineBatches, setOfflineBatches] = useState<OfflineBatch[]>([]);
+  const [metrics, setMetrics] = useState({ revenue: 0, studentsCount: 0, coursesCount: 0, certsCount: 0, ordersCount: 0, batchesCount: 0 });
   const [loading, setLoading] = useState(true);
+
+  // New Offline Batch Form State
+  const [batchForm, setBatchForm] = useState({
+    title: '',
+    city: 'Bengaluru',
+    venue: '',
+    startDate: '',
+    endDate: '',
+    timing: '9:30 AM - 5:30 PM',
+    priceInr: 14999,
+    totalSeats: 25,
+    notes: '',
+  });
+
 
   // File upload input refs
   const courseFileRef = useRef<HTMLInputElement>(null);
@@ -109,12 +143,14 @@ export default function AdminPage() {
         setCertificates(d.certificates || []);
         setStudents(d.students || []);
         setOrders(d.orders || []);
+        setOfflineBatches(d.offlineBatches || []);
         setMetrics({
           revenue: d.metrics?.totalRevenue || 0,
           studentsCount: d.students?.length || 0,
           coursesCount: d.courses?.length || 0,
           certsCount: d.certificates?.length || 0,
           ordersCount: d.orders?.length || 0,
+          batchesCount: d.offlineBatches?.length || 0,
         });
       }
     } catch (err) {
@@ -123,6 +159,7 @@ export default function AdminPage() {
       setLoading(false);
     }
   };
+
 
   useEffect(() => {
     fetchData();
@@ -257,13 +294,60 @@ export default function AdminPage() {
     }
   };
 
+  // Create Offline Batch
+  const handleCreateOfflineBatch = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!batchForm.title || !batchForm.venue) return alert('Please enter batch title and venue');
+    try {
+      const res = await fetch('/api/admin/manage', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'create_offline_batch', ...batchForm }),
+      });
+      if (res.ok) {
+        alert('Offline Batch created successfully!');
+        setBatchForm({
+          title: '',
+          city: 'Bengaluru',
+          venue: '',
+          startDate: '',
+          endDate: '',
+          timing: '9:30 AM - 5:30 PM',
+          priceInr: 14999,
+          totalSeats: 25,
+          notes: '',
+        });
+        fetchData();
+      }
+    } catch {
+      alert('Failed to create offline batch');
+    }
+  };
+
+  // Delete Offline Batch
+  const handleDeleteOfflineBatch = async (batchId: string) => {
+    if (!confirm('Are you sure you want to delete this offline batch?')) return;
+    try {
+      const res = await fetch('/api/admin/manage', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'delete_offline_batch', batchId }),
+      });
+      if (res.ok) fetchData();
+    } catch {
+      alert('Failed to delete offline batch');
+    }
+  };
+
   const navItems = [
     { key: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, count: null },
     { key: 'courses', label: 'Courses', icon: BookOpen, count: courses.length },
+    { key: 'offline', label: 'Offline Batches', icon: MapPin, count: offlineBatches.length },
     { key: 'certificates', label: 'Certificates', icon: Award, count: certificates.length },
     { key: 'students', label: 'Students Access', icon: Users, count: students.length },
     { key: 'orders', label: 'Orders & Payments', icon: CreditCard, count: orders.length },
   ];
+
 
   return (
     <div className="flex min-h-screen bg-black text-white font-sans antialiased">
@@ -374,75 +458,94 @@ export default function AdminPage() {
           {activeTab === 'dashboard' && (
             <div className="space-y-6">
               {/* Stat Cards */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                <div className="p-5 rounded-2xl border border-[#222222] bg-[#111111] space-y-1">
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
+                <div className="p-4 rounded-2xl border border-[#222222] bg-[#111111] space-y-1">
                   <div className="text-xs text-[#a1a1aa] font-semibold flex items-center justify-between">
                     <span>Revenue</span>
                     <DollarSign className="h-4 w-4 text-[#10b981]" />
                   </div>
-                  <div className="text-2xl font-black text-white font-mono">
+                  <div className="text-xl sm:text-2xl font-black text-white font-mono">
                     ₹{metrics.revenue.toLocaleString('en-IN')}
                   </div>
-                  <div className="text-[11px] text-[#10b981]">Razorpay Live Sync</div>
+                  <div className="text-[10px] text-[#10b981]">Razorpay Gateway</div>
                 </div>
 
-                <div className="p-5 rounded-2xl border border-[#222222] bg-[#111111] space-y-1">
+                <div className="p-4 rounded-2xl border border-[#222222] bg-[#111111] space-y-1">
                   <div className="text-xs text-[#a1a1aa] font-semibold flex items-center justify-between">
-                    <span>Courses</span>
+                    <span>Online Courses</span>
                     <BookOpen className="h-4 w-4 text-[#10b981]" />
                   </div>
-                  <div className="text-2xl font-black text-white font-mono">{metrics.coursesCount}</div>
-                  <div className="text-[11px] text-[#a1a1aa]">Published syllabuses</div>
+                  <div className="text-xl sm:text-2xl font-black text-white font-mono">{metrics.coursesCount}</div>
+                  <div className="text-[10px] text-[#a1a1aa]">Recorded video access</div>
                 </div>
 
-                <div className="p-5 rounded-2xl border border-[#222222] bg-[#111111] space-y-1">
+                <div className="p-4 rounded-2xl border border-[#222222] bg-[#111111] space-y-1">
+                  <div className="text-xs text-[#a1a1aa] font-semibold flex items-center justify-between">
+                    <span>Offline Batches</span>
+                    <MapPin className="h-4 w-4 text-[#10b981]" />
+                  </div>
+                  <div className="text-xl sm:text-2xl font-black text-white font-mono">{offlineBatches.length}</div>
+                  <div className="text-[10px] text-[#10b981]">Classroom / In-Person</div>
+                </div>
+
+                <div className="p-4 rounded-2xl border border-[#222222] bg-[#111111] space-y-1">
                   <div className="text-xs text-[#a1a1aa] font-semibold flex items-center justify-between">
                     <span>Certificates</span>
                     <Award className="h-4 w-4 text-[#10b981]" />
                   </div>
-                  <div className="text-2xl font-black text-white font-mono">{metrics.certsCount}</div>
-                  <div className="text-[11px] text-[#a1a1aa]">Verified proofs</div>
+                  <div className="text-xl sm:text-2xl font-black text-white font-mono">{metrics.certsCount}</div>
+                  <div className="text-[10px] text-[#a1a1aa]">Payout proofs</div>
                 </div>
 
-                <div className="p-5 rounded-2xl border border-[#222222] bg-[#111111] space-y-1">
+                <div className="p-4 rounded-2xl border border-[#222222] bg-[#111111] space-y-1">
                   <div className="text-xs text-[#a1a1aa] font-semibold flex items-center justify-between">
                     <span>Students</span>
                     <Users className="h-4 w-4 text-[#10b981]" />
                   </div>
-                  <div className="text-2xl font-black text-white font-mono">{metrics.studentsCount}</div>
-                  <div className="text-[11px] text-[#a1a1aa]">Active accounts</div>
+                  <div className="text-xl sm:text-2xl font-black text-white font-mono">{metrics.studentsCount}</div>
+                  <div className="text-[10px] text-[#a1a1aa]">Active learners</div>
                 </div>
               </div>
 
               {/* Quick Jump Actions */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
                 <button
                   onClick={() => setActiveTab('courses')}
-                  className="p-5 rounded-2xl border border-[#222222] bg-[#111111] hover:border-[#10b981] transition text-left space-y-2 cursor-pointer"
+                  className="p-4 rounded-2xl border border-[#222222] bg-[#111111] hover:border-[#10b981] transition text-left space-y-2 cursor-pointer"
                 >
                   <BookOpen className="h-5 w-5 text-[#10b981]" />
-                  <div className="text-sm font-bold text-white">Add or Edit Courses</div>
-                  <div className="text-xs text-[#a1a1aa]">Upload course thumbnails from computer and manage price</div>
+                  <div className="text-sm font-bold text-white">Online Courses</div>
+                  <div className="text-xs text-[#a1a1aa]">Upload course thumbnails from PC & set prices</div>
+                </button>
+
+                <button
+                  onClick={() => setActiveTab('offline')}
+                  className="p-4 rounded-2xl border border-[#222222] bg-[#111111] hover:border-[#10b981] transition text-left space-y-2 cursor-pointer"
+                >
+                  <MapPin className="h-5 w-5 text-[#10b981]" />
+                  <div className="text-sm font-bold text-white">Offline Batches</div>
+                  <div className="text-xs text-[#a1a1aa]">Create city boot camps, venues, dates & seat counts</div>
                 </button>
 
                 <button
                   onClick={() => setActiveTab('certificates')}
-                  className="p-5 rounded-2xl border border-[#222222] bg-[#111111] hover:border-[#10b981] transition text-left space-y-2 cursor-pointer"
+                  className="p-4 rounded-2xl border border-[#222222] bg-[#111111] hover:border-[#10b981] transition text-left space-y-2 cursor-pointer"
                 >
                   <Award className="h-5 w-5 text-[#10b981]" />
-                  <div className="text-sm font-bold text-white">Upload Payout Certificates</div>
-                  <div className="text-xs text-[#a1a1aa]">Select payout proofs from your computer to show publicly</div>
+                  <div className="text-sm font-bold text-white">Payout Proofs</div>
+                  <div className="text-xs text-[#a1a1aa]">Upload certificates directly from computer</div>
                 </button>
 
                 <button
                   onClick={() => setActiveTab('students')}
-                  className="p-5 rounded-2xl border border-[#222222] bg-[#111111] hover:border-[#10b981] transition text-left space-y-2 cursor-pointer"
+                  className="p-4 rounded-2xl border border-[#222222] bg-[#111111] hover:border-[#10b981] transition text-left space-y-2 cursor-pointer"
                 >
                   <Users className="h-5 w-5 text-[#10b981]" />
                   <div className="text-sm font-bold text-white">Student Permissions</div>
                   <div className="text-xs text-[#a1a1aa]">Grant or revoke student access with 1 click</div>
                 </button>
               </div>
+
             </div>
           )}
 
@@ -844,7 +947,264 @@ export default function AdminPage() {
             </div>
           )}
 
+          {/* TAB: OFFLINE BATCHES & CLASSROOM TRAINING */}
+          {activeTab === 'offline' && (
+            <div className="space-y-6">
+              {/* Create Offline Batch Form */}
+              <div className="rounded-2xl border border-[#222222] bg-[#111111] p-6 space-y-4">
+                <div className="flex items-center justify-between border-b border-[#222222] pb-4">
+                  <div>
+                    <h2 className="text-base font-bold text-white flex items-center gap-2">
+                      <Plus className="h-4 w-4 text-[#10b981]" /> Schedule New In-Person Offline Batch
+                    </h2>
+                    <p className="text-xs text-[#a1a1aa] mt-0.5">
+                      Set city, venue, training dates, ticket price, and seat capacity for in-person workshops.
+                    </p>
+                  </div>
+                  <span className="px-2.5 py-1 rounded-md text-[10px] font-bold bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/30">
+                    Classroom Mode
+                  </span>
+                </div>
+
+                <form onSubmit={handleCreateOfflineBatch} className="space-y-4 text-xs">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <label className="text-white font-semibold">Batch Program Title *</label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g. 3-Day Institutional SMC Live Trading Boot Camp"
+                        value={batchForm.title}
+                        onChange={(e) => setBatchForm({ ...batchForm, title: e.target.value })}
+                        className="w-full p-2.5 rounded-xl bg-black border border-[#222222] text-white focus:border-[#10b981] focus:outline-none"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-1">
+                        <label className="text-white font-semibold">Host City *</label>
+                        <select
+                          value={batchForm.city}
+                          onChange={(e) => setBatchForm({ ...batchForm, city: e.target.value })}
+                          className="w-full p-2.5 rounded-xl bg-black border border-[#222222] text-white focus:border-[#10b981] focus:outline-none"
+                        >
+                          <option>Bengaluru</option>
+                          <option>Mumbai</option>
+                          <option>Delhi NCR</option>
+                          <option>Hyderabad</option>
+                          <option>Chennai</option>
+                          <option>Kolkata</option>
+                          <option>Pune</option>
+                          <option>Ahmedabad</option>
+                        </select>
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-white font-semibold">Seat Limit *</label>
+                        <input
+                          type="number"
+                          required
+                          value={batchForm.totalSeats}
+                          onChange={(e) => setBatchForm({ ...batchForm, totalSeats: Number(e.target.value) })}
+                          className="w-full p-2.5 rounded-xl bg-black border border-[#222222] text-white focus:border-[#10b981] focus:outline-none"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div className="space-y-1 sm:col-span-2">
+                      <label className="text-white font-semibold flex items-center gap-1">
+                        <MapPin className="h-3.5 w-3.5 text-[#10b981]" /> Venue / Hotel Address *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g. The Leela Palace, Indiranagar / Executive Trading Lab"
+                        value={batchForm.venue}
+                        onChange={(e) => setBatchForm({ ...batchForm, venue: e.target.value })}
+                        className="w-full p-2.5 rounded-xl bg-black border border-[#222222] text-white focus:border-[#10b981] focus:outline-none"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-white font-semibold">Fee per Student (INR) *</label>
+                      <input
+                        type="number"
+                        required
+                        value={batchForm.priceInr}
+                        onChange={(e) => setBatchForm({ ...batchForm, priceInr: Number(e.target.value) })}
+                        className="w-full p-2.5 rounded-xl bg-black border border-[#222222] text-white focus:border-[#10b981] focus:outline-none font-mono"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div className="space-y-1">
+                      <label className="text-white font-semibold flex items-center gap-1">
+                        <Calendar className="h-3.5 w-3.5 text-[#10b981]" /> Start Date *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g. Nov 14, 2026"
+                        value={batchForm.startDate}
+                        onChange={(e) => setBatchForm({ ...batchForm, startDate: e.target.value })}
+                        className="w-full p-2.5 rounded-xl bg-black border border-[#222222] text-white focus:border-[#10b981] focus:outline-none"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-white font-semibold flex items-center gap-1">
+                        <Calendar className="h-3.5 w-3.5 text-[#10b981]" /> End Date *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g. Nov 16, 2026"
+                        value={batchForm.endDate}
+                        onChange={(e) => setBatchForm({ ...batchForm, endDate: e.target.value })}
+                        className="w-full p-2.5 rounded-xl bg-black border border-[#222222] text-white focus:border-[#10b981] focus:outline-none"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-white font-semibold flex items-center gap-1">
+                        <Clock className="h-3.5 w-3.5 text-[#10b981]" /> Session Hours
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="9:30 AM - 5:30 PM IST"
+                        value={batchForm.timing}
+                        onChange={(e) => setBatchForm({ ...batchForm, timing: e.target.value })}
+                        className="w-full p-2.5 rounded-xl bg-black border border-[#222222] text-white focus:border-[#10b981] focus:outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-white font-semibold">Special Instructions / Mentor Notes</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Bring laptops with TradingView installed. Lunch and course material included."
+                      value={batchForm.notes}
+                      onChange={(e) => setBatchForm({ ...batchForm, notes: e.target.value })}
+                      className="w-full p-2.5 rounded-xl bg-black border border-[#222222] text-white focus:border-[#10b981] focus:outline-none"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-full py-3 rounded-xl bg-[#10b981] hover:bg-[#059669] text-black font-extrabold text-sm transition cursor-pointer"
+                  >
+                    + Publish In-Person Batch
+                  </button>
+                </form>
+              </div>
+
+              {/* Offline Batches Grid */}
+              <div className="space-y-3">
+                <h3 className="text-sm font-bold text-white">Active Classroom Batches ({offlineBatches.length})</h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {offlineBatches.map((b) => {
+                    const remainingSeats = Math.max(0, b.totalSeats - b.bookedSeats);
+                    const percentFilled = Math.round((b.bookedSeats / b.totalSeats) * 100);
+
+                    return (
+                      <div
+                        key={b.id}
+                        className="p-5 rounded-2xl border border-[#222222] bg-[#111111] space-y-4 flex flex-col justify-between"
+                      >
+                        <div className="space-y-3">
+                          <div className="flex items-start justify-between gap-3">
+                            <div>
+                              <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-[#10b981]/15 border border-[#10b981]/30 text-[#10b981] text-[10px] font-bold uppercase mb-1.5">
+                                <MapPin className="h-3 w-3" /> {b.city}
+                              </div>
+                              <h4 className="text-base font-bold text-white">{b.title}</h4>
+                            </div>
+
+                            <div className="text-right shrink-0">
+                              <span className="text-base font-black text-white font-mono">₹{b.priceInr.toLocaleString('en-IN')}</span>
+                              <div className="text-[10px] text-[#a1a1aa]">Per Seat</div>
+                            </div>
+                          </div>
+
+                          <div className="space-y-1.5 text-xs text-[#a1a1aa] bg-black/50 p-3 rounded-xl border border-[#222222]">
+                            <div className="flex items-center gap-2 text-white/90">
+                              <MapPin className="h-3.5 w-3.5 text-[#10b981] shrink-0" />
+                              <span className="font-semibold">{b.venue}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Calendar className="h-3.5 w-3.5 text-[#10b981] shrink-0" />
+                              <span>{b.startDate} to {b.endDate}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Clock className="h-3.5 w-3.5 text-[#10b981] shrink-0" />
+                              <span>{b.timing}</span>
+                            </div>
+                          </div>
+
+                          {b.notes && (
+                            <p className="text-xs text-white/70 italic bg-[#161618] p-2.5 rounded-lg border border-[#222222]">
+                              &quot;{b.notes}&quot;
+                            </p>
+                          )}
+
+                          {/* Seat Capacity Bar */}
+                          <div className="space-y-1 pt-1">
+                            <div className="flex items-center justify-between text-xs">
+                              <span className="text-[#a1a1aa]">
+                                Enrolled: <strong className="text-white">{b.bookedSeats}</strong> / {b.totalSeats} seats
+                              </span>
+                              <span className="font-bold text-[#10b981]">{remainingSeats} seats left</span>
+                            </div>
+                            <div className="h-2 w-full bg-black rounded-full overflow-hidden border border-[#222222]">
+                              <div
+                                style={{ width: `${percentFilled}%` }}
+                                className="h-full bg-gradient-to-r from-[#059669] to-[#10b981] rounded-full transition-all"
+                              />
+                            </div>
+                          </div>
+
+                          {/* Enrolled students in batch */}
+                          {b.enrolledStudents && b.enrolledStudents.length > 0 && (
+                            <div className="pt-2">
+                              <span className="text-[11px] font-bold text-[#a1a1aa] block mb-1">Registered Attendees:</span>
+                              <div className="flex flex-wrap gap-1">
+                                {b.enrolledStudents.map((name, i) => (
+                                  <span key={i} className="px-2 py-0.5 rounded bg-black border border-[#222222] text-[10px] text-white">
+                                    {name}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="pt-3 border-t border-[#1a1a1a] flex items-center justify-between">
+                          <span className="text-[10px] uppercase font-bold text-[#10b981] bg-[#10b981]/15 px-2 py-0.5 rounded">
+                            {b.status}
+                          </span>
+
+                          <button
+                            onClick={() => handleDeleteOfflineBatch(b.id)}
+                            className="text-xs text-rose-400 hover:text-rose-300 flex items-center gap-1 cursor-pointer"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" /> Delete Batch
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* TAB: ORDERS & PAYMENTS */}
+
           {activeTab === 'orders' && (
             <div className="space-y-4">
               <div className="rounded-2xl border border-[#222222] bg-[#111111] p-6 space-y-4">

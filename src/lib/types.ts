@@ -89,3 +89,20 @@ export interface LessonProgress {
   completed: boolean;
   updatedAt: string;
 }
+
+export interface OfflineBatch {
+  id: string;
+  title: string;
+  city: string; // e.g. Bengaluru, Mumbai, Delhi, Hyderabad
+  venue: string; // Hotel/Auditorium/Trading Floor
+  startDate: string; // e.g. "Nov 15, 2026"
+  endDate: string; // e.g. "Nov 17, 2026"
+  timing: string; // e.g. "9:30 AM - 5:30 PM"
+  priceInr: number;
+  totalSeats: number;
+  bookedSeats: number;
+  status: 'upcoming' | 'ongoing' | 'completed' | 'sold_out';
+  notes?: string;
+  enrolledStudents?: string[]; // Student names or IDs
+}
+

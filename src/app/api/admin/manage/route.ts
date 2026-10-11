@@ -36,12 +36,14 @@ export async function GET() {
       coursesCount: courses.length,
       certificatesCount: db.getAllCertificatesAdmin().length,
       lessonsCount: lessons.length,
+      offlineBatchesCount: db.getOfflineBatches().length,
     },
     students: studentsList,
     orders,
     courses,
     lessons,
     certificates: db.getAllCertificatesAdmin(),
+    offlineBatches: db.getOfflineBatches(),
   });
 }
 
@@ -79,9 +81,31 @@ export async function POST(req: Request) {
       const body = await req.clone().json();
       const res = db.deleteLesson(body.lessonId);
       return NextResponse.json({ success: res });
+    } else if (action === 'create_offline_batch') {
+      const body = await req.clone().json();
+      const newBatch = db.createOfflineBatch({
+        title: body.title,
+        city: body.city || 'Bengaluru',
+        venue: body.venue || 'City Trading Center',
+        startDate: body.startDate || 'Upcoming',
+        endDate: body.endDate || 'Upcoming',
+        timing: body.timing || '9:30 AM - 5:30 PM',
+        priceInr: Number(body.priceInr) || 14999,
+        totalSeats: Number(body.totalSeats) || 25,
+        bookedSeats: 0,
+        status: 'upcoming',
+        notes: body.notes || '',
+        enrolledStudents: [],
+      });
+      return NextResponse.json({ success: true, batch: newBatch });
+    } else if (action === 'delete_offline_batch') {
+      const body = await req.clone().json();
+      const res = db.deleteOfflineBatch(body.batchId);
+      return NextResponse.json({ success: res });
     }
 
     return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
+
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : 'Admin action failed';
     return NextResponse.json({ error: msg }, { status: 500 });
