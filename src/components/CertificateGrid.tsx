@@ -24,17 +24,17 @@ export default function CertificateGrid({ certificates, limit }: Props) {
             className="tv-dark-card group relative cursor-pointer overflow-hidden"
           >
             {/* Image Preview */}
-            <div className="relative aspect-[16/10] w-full overflow-hidden bg-[#131722]">
+            <div className="relative aspect-[16/10] w-full overflow-hidden bg-black">
               <img
                 src={cert.imageUrl}
                 alt={cert.title}
                 className="h-full w-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#1e222d] via-transparent to-transparent opacity-90" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90" />
 
               {/* Tag */}
               <div className="absolute top-3 left-3">
-                <span className="inline-flex items-center gap-1 rounded-full bg-[#131722]/90 border border-[#2a2e39] px-2.5 py-0.5 text-[10px] font-semibold text-[#089981] shadow-xs">
+                <span className="inline-flex items-center gap-1 rounded-full bg-black/90 border border-[#222222] px-2.5 py-0.5 text-[10px] font-semibold text-[#089981] shadow-xs">
                   <ShieldCheck className="h-3 w-3" />
                   {cert.accountType}
                 </span>
@@ -86,13 +86,13 @@ export default function CertificateGrid({ certificates, limit }: Props) {
           onClick={() => setSelectedCert(null)}
         >
           <div
-            className="relative max-w-4xl w-full rounded-2xl bg-[#1e222d] border border-[#2a2e39] p-6 shadow-2xl space-y-4"
+            className="relative max-w-4xl w-full rounded-2xl bg-[#111111] border border-[#222222] p-6 shadow-2xl space-y-4"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close Button */}
             <button
               onClick={() => setSelectedCert(null)}
-              className="absolute top-4 right-4 p-2 text-[#787b86] hover:text-white rounded-full bg-[#2a2e39] hover:bg-[#363a45] transition"
+              className="absolute top-4 right-4 p-2 text-[#a1a1aa] hover:text-white rounded-full bg-[#1c1c1c] hover:bg-[#252525] transition"
             >
               <X className="h-4 w-4" />
             </button>
@@ -105,13 +105,13 @@ export default function CertificateGrid({ certificates, limit }: Props) {
               <h3 className="text-xl font-bold text-white mt-2">
                 {selectedCert.title}
               </h3>
-              <p className="text-xs text-[#787b86] mt-1">
+              <p className="text-xs text-[#a1a1aa] mt-1">
                 Issued by: <strong className="text-white">{selectedCert.firmOrBroker}</strong> on {selectedCert.date}
               </p>
             </div>
 
             {/* Image */}
-            <div className="relative max-h-[60vh] w-full overflow-hidden rounded-xl bg-[#131722] border border-[#2a2e39] flex items-center justify-center">
+            <div className="relative max-h-[60vh] w-full overflow-hidden rounded-xl bg-black border border-[#222222] flex items-center justify-center">
               <img
                 src={selectedCert.imageUrl}
                 alt={selectedCert.title}

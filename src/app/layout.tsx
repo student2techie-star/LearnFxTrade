@@ -35,9 +35,9 @@ export default function RootLayout({
           strategy="lazyOnload"
         />
       </head>
-      <body className="min-h-screen bg-[#131722] text-[#d1d4dc] antialiased flex flex-col selection:bg-[#2962ff] selection:text-white">
+      <body className="min-h-screen bg-black text-white antialiased flex flex-col selection:bg-[#2962ff] selection:text-white">
         <AuthProvider>
-          <Suspense fallback={<div className="h-20 bg-[#131722] border-b border-[#2a2e39]" />}>
+          <Suspense fallback={<div className="h-20 bg-black border-b border-[#222222]" />}>
             <Navbar />
           </Suspense>
           <main className="flex-1">

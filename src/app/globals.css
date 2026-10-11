@@ -9,35 +9,36 @@
   /* Brand */
   --brand: #2962ff;
   --brand-hover: #1e53e5;
-  --brand-soft: rgba(41, 98, 255, 0.14);
+  --brand-soft: rgba(41, 98, 255, 0.18);
 
   /* Market colors */
   --up: #089981;
-  --up-soft: rgba(8, 153, 129, 0.14);
+  --up-soft: rgba(8, 153, 129, 0.18);
   --down: #f23645;
-  --down-soft: rgba(242, 54, 69, 0.14);
+  --down-soft: rgba(242, 54, 69, 0.18);
   --warn: #ff9800;
   --gold: #fdd835;
 
-  /* Dark theme (default) */
-  --bg: #131722;
-  --bg-alt: #0c0e14;
-  --surface: #1e222d;
-  --surface-2: #2a2e39;
-  --border: #2a2e39;
-  --text: #d1d4dc;
+  /* Pure Black & White theme */
+  --bg: #000000;
+  --bg-alt: #0a0a0a;
+  --surface: #111111;
+  --surface-2: #1c1c1c;
+  --border: #222222;
+  --border-hover: #333333;
+  --text: #ffffff;
   --text-strong: #ffffff;
-  --text-muted: #787b86;
-  --overlay: rgba(0, 0, 0, 0.72);
-  --shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --text-muted: #a1a1aa;
+  --overlay: rgba(0, 0, 0, 0.85);
+  --shadow: 0 8px 30px rgba(0, 0, 0, 0.8);
 
   /* Legacy & compatibility aliases */
-  --background: #131722;
+  --background: #000000;
   --tv-blue: #2962ff;
   --tv-blue-hover: #1e53e5;
   --tv-green: #089981;
   --tv-red: #f23645;
-  --foreground: #d1d4dc;
+  --foreground: #ffffff;
   --text-white: #ffffff;
 
   /* Type */

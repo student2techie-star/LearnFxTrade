@@ -19,7 +19,7 @@ const TICKER_ITEMS = [
 
 export default function MarketTicker() {
   return (
-    <div className="w-full bg-[#0d1017] border-b border-[#2a2e39] py-1.5 overflow-hidden select-none">
+    <div className="w-full bg-black border-b border-[#222222] py-1.5 overflow-hidden select-none">
       <div className="animate-ticker flex items-center gap-7 text-[11px] font-mono">
         {[...TICKER_ITEMS, ...TICKER_ITEMS].map((item, idx) => (
           <div key={idx} className="flex items-center gap-2 shrink-0">

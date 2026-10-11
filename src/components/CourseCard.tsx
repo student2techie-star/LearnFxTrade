@@ -22,20 +22,20 @@ export default function CourseCard({ course }: Props) {
     <div className="tv-dark-card group flex flex-col justify-between overflow-hidden">
       <div>
         {/* Media Thumbnail */}
-        <div className="relative aspect-[16/9] w-full overflow-hidden bg-[#181d2a]">
+        <div className="relative aspect-[16/9] w-full overflow-hidden bg-black">
           <img
             src={course.thumbnailUrl}
             alt={course.title}
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#1e222d] via-transparent to-transparent opacity-90" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90" />
 
           {/* Category Badges */}
           <div className="absolute top-3 left-3 flex items-center gap-2">
-            <span className="rounded-full bg-[#131722]/90 backdrop-blur-md px-3 py-1 text-[11px] font-semibold text-white border border-[#2a2e39] shadow-sm">
+            <span className="rounded-full bg-black/90 backdrop-blur-md px-3 py-1 text-[11px] font-semibold text-white border border-[#222222] shadow-sm">
               {course.category}
             </span>
-            <span className="rounded-full bg-[#131722]/90 backdrop-blur-md px-2.5 py-0.5 text-[10px] font-semibold text-[#787b86] border border-[#2a2e39]">
+            <span className="rounded-full bg-black/90 backdrop-blur-md px-2.5 py-0.5 text-[10px] font-semibold text-[#a1a1aa] border border-[#222222]">
               {course.level}
             </span>
           </div>
