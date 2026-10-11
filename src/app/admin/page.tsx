@@ -93,8 +93,8 @@ export default function AdminPage() {
   // New Offline Batch Form State
   const [batchForm, setBatchForm] = useState({
     title: '',
-    city: 'Bengaluru',
-    venue: '',
+    city: 'Chennai',
+    venue: 'ITC Grand Chola / Guindy Tech Trading Hub, Chennai',
     startDate: '',
     endDate: '',
     timing: '9:30 AM - 5:30 PM',
@@ -102,6 +102,7 @@ export default function AdminPage() {
     totalSeats: 25,
     notes: '',
   });
+
 
 
   // File upload input refs

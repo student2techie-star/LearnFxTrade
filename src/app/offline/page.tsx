@@ -115,31 +115,32 @@ export default function OfflineClassesPage() {
         <div className="mx-auto max-w-5xl text-center space-y-6">
           <div className="inline-flex items-center gap-2 rounded-full border border-[#10b981]/30 bg-[#10b981]/10 px-4 py-1.5 text-xs font-bold text-[#10b981]">
             <Sparkles className="h-4 w-4" />
-            <span>Classroom Training • Live Floor Execution Across India</span>
+            <span>Classroom Training • Live Floor Execution • Chennai Hub</span>
           </div>
 
           <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-white leading-tight">
-            Learn In-Person With The Mentor. <br />
-            <span className="text-[#10b981]">Offline Trading Boot Camps</span>
+            Learn In-Person in Chennai. <br />
+            <span className="text-[#10b981]">Institutional Offline Boot Camps</span>
           </h1>
 
           <p className="mx-auto max-w-2xl text-sm sm:text-base text-[#a1a1aa] leading-relaxed">
-            Experience institutional order flow live on trading floor screens. Master Institutional Forex (SMC) & Nifty/BankNifty Price Action side-by-side with strict 1:3+ risk management.
+            Held exclusively at our premier Chennai trading floor venue. Choose your preferred batch date to master Institutional Forex SMC & Nifty/BankNifty options with live mentor supervision.
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-6 pt-4 text-xs font-semibold text-white/80">
             <span className="flex items-center gap-1.5">
+              <MapPin className="h-4 w-4 text-[#10b981]" /> ITC Grand Chola / Guindy, Chennai
+            </span>
+            <span className="flex items-center gap-1.5">
               <CheckCircle2 className="h-4 w-4 text-[#10b981]" /> Live Market Hours Execution
             </span>
             <span className="flex items-center gap-1.5">
-              <CheckCircle2 className="h-4 w-4 text-[#10b981]" /> 1-on-1 Drawdown Review
-            </span>
-            <span className="flex items-center gap-1.5">
-              <CheckCircle2 className="h-4 w-4 text-[#10b981]" /> Strictly Limited Seats Per City
+              <CheckCircle2 className="h-4 w-4 text-[#10b981]" /> Strictly Limited Seats Per Batch
             </span>
           </div>
         </div>
       </section>
+
 
       {/* 2. BATCHES CONTAINER */}
       <section className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 pt-12 space-y-8">

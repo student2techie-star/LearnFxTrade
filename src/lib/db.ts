@@ -1,69 +1,70 @@
 import { Course, Lesson, PayoutCertificate, User, Order, Enrollment, LessonProgress, OfflineBatch } from './types';
 import { INITIAL_COURSES, INITIAL_LESSONS, INITIAL_CERTIFICATES, INITIAL_USERS, INITIAL_ENROLLMENTS, INITIAL_ORDERS } from './mock-data';
 
-// Initial sample offline batches for India
+// Initial sample offline batches for Chennai across different dates
 const INITIAL_OFFLINE_BATCHES: OfflineBatch[] = [
   {
-    id: 'batch-blr-01',
-    title: '3-Day Institutional SMC Boot Camp',
-    city: 'Bengaluru',
-    venue: 'The Leela Palace / Indiranagar Trading Hub',
-    startDate: 'Nov 14, 2026',
-    endDate: 'Nov 16, 2026',
+    id: 'batch-chn-01',
+    title: 'Batch 01: 3-Day Institutional SMC & Forex Masterclass',
+    city: 'Chennai',
+    venue: 'ITC Grand Chola / Guindy Tech Trading Hub, Chennai',
+    startDate: 'Nov 20, 2026',
+    endDate: 'Nov 22, 2026',
     timing: '9:30 AM - 5:30 PM IST',
     priceInr: 14999,
     totalSeats: 25,
-    bookedSeats: 18,
+    bookedSeats: 19,
     status: 'upcoming',
-    notes: 'Includes live London session order flow trading + 1-on-1 drawdown strategy review.',
-    enrolledStudents: ['Rahul Sharma', 'Ananya Patel', 'Karan Mehta'],
+    notes: 'Live London session execution + Prop firm evaluation challenge passing framework. Printed SOP handbook and meals provided.',
+    enrolledStudents: ['Karthik Raman', 'Priya Sundaram', 'Vignesh K'],
   },
   {
-    id: 'batch-mum-02',
-    title: 'Nifty & BankNifty Price Action Live Trading Floor',
-    city: 'Mumbai',
-    venue: 'Bandra Kurla Complex (BKC) Executive Center',
-    startDate: 'Dec 05, 2026',
-    endDate: 'Dec 07, 2026',
-    timing: '9:00 AM - 4:30 PM IST',
-    priceInr: 16999,
-    totalSeats: 30,
-    bookedSeats: 24,
+    id: 'batch-chn-02',
+    title: 'Batch 02: Nifty & BankNifty Live Price Action Floor',
+    city: 'Chennai',
+    venue: 'ITC Grand Chola / Guindy Tech Trading Hub, Chennai',
+    startDate: 'Dec 11, 2026',
+    endDate: 'Dec 13, 2026',
+    timing: '9:15 AM - 4:30 PM IST',
+    priceInr: 14999,
+    totalSeats: 25,
+    bookedSeats: 16,
     status: 'upcoming',
-    notes: 'Live market execution during Indian market trading hours with mentor on large screens.',
-    enrolledStudents: ['Vikram Singh', 'Pooja Iyer'],
+    notes: 'Live trading during Indian market hours. Master Central Pivot Range (CPR), Open Interest (OI) traps, and Option Buying.',
+    enrolledStudents: ['Sanjay Narayanan', 'Divya Balaji'],
   },
   {
-    id: 'batch-del-03',
-    title: 'Delhi Prop Firm Funded Trader Accelerator Masterclass',
-    city: 'Delhi NCR',
-    venue: 'Aerocity Worldmark Executive Tower, New Delhi',
-    startDate: 'Dec 18, 2026',
-    endDate: 'Dec 20, 2026',
-    timing: '10:00 AM - 6:00 PM IST',
-    priceInr: 15499,
-    totalSeats: 20,
-    bookedSeats: 14,
-    status: 'upcoming',
-    notes: 'Master FTMO & FundedNext evaluation challenge passing models with live New York session scalping.',
-    enrolledStudents: ['Aman Verma', 'Simran Kaur', 'Deepak Rawat'],
-  },
-  {
-    id: 'batch-hyd-04',
-    title: 'Hyderabad Elite Option Scalping & Algo Order Flow Lab',
-    city: 'Hyderabad',
-    venue: 'Hitec City Cyber Towers Convention Suite',
+    id: 'batch-chn-03',
+    title: 'Batch 03: Complete Institutional SMC & Index Option Trading',
+    city: 'Chennai',
+    venue: 'ITC Grand Chola / Guindy Tech Trading Hub, Chennai',
     startDate: 'Jan 08, 2027',
     endDate: 'Jan 10, 2027',
-    timing: '9:15 AM - 4:30 PM IST',
-    priceInr: 13999,
-    totalSeats: 25,
-    bookedSeats: 11,
+    timing: '9:30 AM - 5:30 PM IST',
+    priceInr: 15999,
+    totalSeats: 30,
+    bookedSeats: 12,
     status: 'upcoming',
-    notes: 'Focus on expiry day momentum bursts, open interest traps, and strict capital allocation.',
-    enrolledStudents: ['Suresh Reddy', 'Naveen Kumar'],
+    notes: 'Combined intensive 3-day boot camp covering both Forex Smart Money Concepts & Nifty Index derivatives.',
+    enrolledStudents: ['Arun Kumar', 'Meena Rajan', 'Harish V'],
+  },
+  {
+    id: 'batch-chn-04',
+    title: 'Batch 04: Elite Funded Trader Drawdown & Scalping Lab',
+    city: 'Chennai',
+    venue: 'ITC Grand Chola / Guindy Tech Trading Hub, Chennai',
+    startDate: 'Jan 29, 2027',
+    endDate: 'Jan 31, 2027',
+    timing: '9:30 AM - 5:30 PM IST',
+    priceInr: 14999,
+    totalSeats: 20,
+    bookedSeats: 6,
+    status: 'upcoming',
+    notes: 'Exclusive small-group intensive session focusing on strict risk mathematics, clearing FTMO/FundedNext accounts, and emotional control.',
+    enrolledStudents: ['Rajesh Mohan'],
   },
 ];
+
 
 
 // Persistent local storage simulator for server routes and client side
@@ -324,7 +325,12 @@ class DataStore {
 
     return { success: true, batch: b };
   }
+
+  resetOfflineBatches(): void {
+    this.offlineBatches = [...INITIAL_OFFLINE_BATCHES];
+  }
 }
+
 
 
 
