@@ -25,6 +25,8 @@ export async function GET() {
     };
   });
 
+  const lessons = courses.flatMap(c => db.getLessonsByCourseId(c.id));
+
   return NextResponse.json({
     metrics: {
       totalStudents: users.filter(u => u.role === 'student').length,
@@ -33,13 +35,16 @@ export async function GET() {
       totalRevenue,
       coursesCount: courses.length,
       certificatesCount: db.getAllCertificatesAdmin().length,
+      lessonsCount: lessons.length,
     },
     students: studentsList,
     orders,
     courses,
+    lessons,
     certificates: db.getAllCertificatesAdmin(),
   });
 }
+
 
 export async function POST(req: Request) {
   try {
@@ -51,6 +56,29 @@ export async function POST(req: Request) {
     } else if (action === 'revoke_access') {
       const res = db.revokeEnrollment(userId, courseId);
       return NextResponse.json({ success: true, revoked: res });
+    } else if (action === 'delete_course') {
+      const res = db.deleteCourse(courseId);
+      return NextResponse.json({ success: res });
+    } else if (action === 'delete_certificate') {
+      const { certId } = await req.clone().json();
+      const res = db.deleteCertificate(certId);
+      return NextResponse.json({ success: res });
+    } else if (action === 'add_lesson') {
+      const body = await req.clone().json();
+      const newLesson = db.createLesson({
+        courseId: body.courseId,
+        title: body.title,
+        videoId: body.videoId,
+        duration: body.duration || '15:00',
+        orderNo: Number(body.orderNo) || 1,
+        isFreePreview: Boolean(body.isFreePreview),
+        description: body.description || '',
+      });
+      return NextResponse.json({ success: true, lesson: newLesson });
+    } else if (action === 'delete_lesson') {
+      const body = await req.clone().json();
+      const res = db.deleteLesson(body.lessonId);
+      return NextResponse.json({ success: res });
     }
 
     return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
@@ -59,3 +87,4 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: msg }, { status: 500 });
   }
 }
+
