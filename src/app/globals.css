@@ -2,18 +2,18 @@
 
 @layer base {
   :root {
-    --background: #131722;
-    --surface: #1e222d;
-    --surface-hover: #2a2e39;
+    --background: #ffffff;
+    --surface: #ffffff;
+    --surface-subtle: #f0f3fa;
+    --surface-hover: #e0e3eb;
     --tv-blue: #2962ff;
     --tv-blue-hover: #1e53e5;
     --tv-green: #089981;
     --tv-red: #f23645;
-    --foreground: #d1d4dc;
-    --text-white: #ffffff;
+    --foreground: #131722;
     --text-muted: #787b86;
-    --border: #2a2e39;
-    --border-light: #363a45;
+    --border: #e0e3eb;
+    --border-subtle: #f0f3fa;
   }
 
   body {
@@ -21,32 +21,67 @@
     color: var(--foreground);
     font-family: -apple-system, BlinkMacSystemFont, "Trebuchet MS", Roboto, Ubuntu, sans-serif;
     overflow-x: hidden;
+    letter-spacing: -0.01em;
   }
 }
 
-/* TradingView style cards & panels */
-.tv-card {
-  background-color: #1e222d;
-  border: 1px solid #2a2e39;
+/* TradingView India Authentic Cards */
+.tv-card-clean {
+  background: #ffffff;
+  border: 1px solid #e0e3eb;
+  border-radius: 12px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tv-card-clean:hover {
+  border-color: #b2b5be;
+  box-shadow: 0 8px 24px rgba(19, 23, 34, 0.08);
+  transform: translateY(-2px);
+}
+
+/* TradingView Market Chip */
+.tv-chip {
+  background: #f0f3fa;
   border-radius: 8px;
-  transition: all 0.2s ease;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
 }
 
-.tv-card:hover {
-  border-color: #363a45;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+.tv-chip:hover {
+  background: #e0e3eb;
+  border-color: #d1d4dc;
 }
 
-.tv-button-primary {
+/* TradingView Standard Blue Pill Button */
+.tv-btn-primary {
   background-color: #2962ff;
   color: #ffffff;
-  border-radius: 6px;
+  border-radius: 9999px;
   font-weight: 600;
-  transition: background-color 0.15s ease;
+  transition: background-color 0.15s ease, transform 0.1s ease;
 }
 
-.tv-button-primary:hover {
+.tv-btn-primary:hover {
   background-color: #1e53e5;
+}
+
+.tv-btn-primary:active {
+  transform: scale(0.98);
+}
+
+/* TradingView Secondary Pill Button */
+.tv-btn-secondary {
+  background-color: #f0f3fa;
+  color: #131722;
+  border-radius: 9999px;
+  font-weight: 600;
+  border: 1px solid #e0e3eb;
+  transition: all 0.15s ease;
+}
+
+.tv-btn-secondary:hover {
+  background-color: #e0e3eb;
+  color: #000000;
 }
 
 /* Ticker Animation */
@@ -58,7 +93,7 @@
 .animate-ticker {
   display: flex;
   width: max-content;
-  animation: tickerSlide 35s linear infinite;
+  animation: tickerSlide 40s linear infinite;
 }
 
 .animate-ticker:hover {
@@ -67,29 +102,29 @@
 
 /* Watermark Float */
 @keyframes floatWatermark {
-  0% { transform: translate(10%, 15%); opacity: 0.18; }
-  25% { transform: translate(75%, 25%); opacity: 0.26; }
-  50% { transform: translate(50%, 80%); opacity: 0.16; }
-  75% { transform: translate(20%, 65%); opacity: 0.24; }
-  100% { transform: translate(10%, 15%); opacity: 0.18; }
+  0% { transform: translate(10%, 15%); opacity: 0.22; }
+  25% { transform: translate(75%, 25%); opacity: 0.30; }
+  50% { transform: translate(50%, 80%); opacity: 0.18; }
+  75% { transform: translate(20%, 65%); opacity: 0.26; }
+  100% { transform: translate(10%, 15%); opacity: 0.22; }
 }
 
 .animate-watermark {
   animation: floatWatermark 20s ease-in-out infinite;
 }
 
-/* TradingView Scrollbars */
+/* TradingView Clean Scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #131722;
+  background: #f0f3fa;
 }
 ::-webkit-scrollbar-thumb {
-  background: #2a2e39;
-  border-radius: 3px;
+  background: #d1d4dc;
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #434651;
+  background: #9598a1;
 }

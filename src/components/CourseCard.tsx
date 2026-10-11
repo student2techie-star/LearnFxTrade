@@ -19,47 +19,47 @@ export default function CourseCard({ course }: Props) {
   );
 
   return (
-    <div className="tv-card group flex flex-col justify-between overflow-hidden">
+    <div className="tv-card-clean group flex flex-col justify-between overflow-hidden">
       <div>
         {/* Media Thumbnail */}
-        <div className="relative aspect-[16/9] w-full overflow-hidden bg-[#131722]">
+        <div className="relative aspect-[16/9] w-full overflow-hidden bg-[#f0f3fa]">
           <img
             src={course.thumbnailUrl}
             alt={course.title}
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#1e222d] via-transparent to-transparent opacity-90" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-80" />
 
-          {/* Badges */}
-          <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5">
-            <span className="rounded bg-[#131722]/90 px-2 py-0.5 text-[10px] font-mono font-semibold text-[#2962ff] border border-[#2a2e39]">
+          {/* Category Badges */}
+          <div className="absolute top-3 left-3 flex items-center gap-2">
+            <span className="rounded-full bg-white/90 backdrop-blur-md px-3 py-1 text-[11px] font-semibold text-[#131722] shadow-sm">
               {course.category}
             </span>
-            <span className="rounded bg-[#131722]/90 px-2 py-0.5 text-[10px] font-mono text-[#787b86] border border-[#2a2e39]">
+            <span className="rounded-full bg-white/90 backdrop-blur-md px-2.5 py-0.5 text-[10px] font-semibold text-[#787b86]">
               {course.level}
             </span>
           </div>
 
           {enrolled && (
-            <div className="absolute top-2.5 right-2.5">
-              <span className="flex items-center gap-1 rounded bg-[#089981] px-2 py-0.5 text-[10px] font-bold text-white shadow">
-                <CheckCircle className="h-3 w-3 stroke-[2.5]" /> ENROLLED
+            <div className="absolute top-3 right-3">
+              <span className="flex items-center gap-1 rounded-full bg-[#089981] px-3 py-1 text-xs font-bold text-white shadow">
+                <CheckCircle className="h-3.5 w-3.5 stroke-[2.5]" /> Enrolled
               </span>
             </div>
           )}
 
           {!enrolled && discountPercent > 0 && (
-            <div className="absolute bottom-2.5 right-2.5">
-              <span className="rounded bg-[#f23645] text-white font-mono font-bold text-[10px] px-1.5 py-0.5">
+            <div className="absolute bottom-3 right-3">
+              <span className="rounded-full bg-[#f23645] text-white font-bold text-xs px-2.5 py-0.5 shadow">
                 {discountPercent}% OFF
               </span>
             </div>
           )}
         </div>
 
-        {/* Content */}
-        <div className="p-4 space-y-2.5">
-          <h3 className="text-base font-bold text-white group-hover:text-[#2962ff] transition-colors line-clamp-2">
+        {/* Content Details */}
+        <div className="p-5 space-y-3">
+          <h3 className="text-lg font-bold text-[#131722] group-hover:text-[#2962ff] transition-colors line-clamp-2">
             {course.title}
           </h3>
 
@@ -67,14 +67,14 @@ export default function CourseCard({ course }: Props) {
             {course.tagline}
           </p>
 
-          <div className="flex items-center gap-3 text-xs font-mono text-[#787b86] pt-1">
-            <span className="flex items-center gap-1">
-              <BookOpen className="h-3.5 w-3.5" />
+          <div className="flex items-center gap-4 text-xs font-medium text-[#787b86] pt-1">
+            <span className="flex items-center gap-1.5">
+              <BookOpen className="h-3.5 w-3.5 text-[#2962ff]" />
               {course.lessonsCount || 10} Lessons
             </span>
             <span>•</span>
-            <span className="flex items-center gap-1">
-              <Clock className="h-3.5 w-3.5" />
+            <span className="flex items-center gap-1.5">
+              <Clock className="h-3.5 w-3.5 text-[#787b86]" />
               {course.totalDuration || '12h'}
             </span>
           </div>
@@ -82,32 +82,32 @@ export default function CourseCard({ course }: Props) {
       </div>
 
       {/* Pricing & Button */}
-      <div className="p-4 pt-2 border-t border-[#2a2e39] flex items-center justify-between">
+      <div className="p-5 pt-3 border-t border-[#e0e3eb] flex items-center justify-between">
         <div>
           <div className="flex items-baseline gap-2">
-            <span className="text-lg font-bold text-white font-mono">
+            <span className="text-2xl font-black text-[#131722] font-mono">
               ₹{course.priceInr.toLocaleString('en-IN')}
             </span>
             <span className="text-xs text-[#787b86] line-through font-mono">
               ₹{course.originalPriceInr.toLocaleString('en-IN')}
             </span>
           </div>
-          <span className="text-[10px] text-[#089981] font-mono block">One-time fee</span>
+          <span className="text-[11px] text-[#089981] font-semibold">One-time payment</span>
         </div>
 
         {enrolled ? (
           <Link
             href={`/learn/${course.slug}`}
-            className="flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded bg-[#089981] text-white hover:bg-[#07806c] transition"
+            className="flex items-center gap-1 px-4 py-2 text-xs font-semibold rounded-full bg-[#089981] text-white hover:bg-[#07806c] transition shadow-xs"
           >
-            <span>Classroom</span> <ArrowRight className="h-3 w-3" />
+            <span>Classroom</span> <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         ) : (
           <Link
             href={`/courses/${course.slug}`}
-            className="flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded bg-[#2962ff] text-white hover:bg-[#1e53e5] transition"
+            className="tv-btn-primary flex items-center gap-1 px-5 py-2 text-xs font-semibold shadow-xs"
           >
-            <span>Explore</span> <ArrowRight className="h-3 w-3" />
+            <span>View Syllabus</span> <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         )}
       </div>
