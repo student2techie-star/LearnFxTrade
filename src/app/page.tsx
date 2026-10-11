@@ -111,12 +111,12 @@ export default function HomePage() {
 
             {/* Pure Black & White Hero Typography */}
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-[1.12]">
-              Look first / Then leap. <br />
-              <span className="text-[#10b981]">Where India Learns & Trades with True Edge.</span>
+              Master Institutional Trading <br />
+              <span className="text-[#10b981]">Forex SMC & Indian Market Edge.</span>
             </h1>
 
             <p className="text-sm sm:text-base text-white/80 max-w-2xl mx-auto leading-relaxed">
-              Master institutional Smart Money Concepts (SMC), Nifty/BankNifty Option buying, and funded prop firm risk frameworks with verified payout proofs and HD structured video lessons.
+              Institutional Smart Money Concepts (SMC), Nifty/BankNifty Option buying, and funded prop firm risk frameworks with verified payout proofs and structured video lessons.
             </p>
 
             {/* Centered Search Command Bar */}
@@ -274,23 +274,14 @@ export default function HomePage() {
 
       {/* 5. COMMUNITY SETUPS FEED */}
       <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-6">
-        <div className="flex items-end justify-between pb-3 border-b border-[#222222]">
-          <div>
-            <div className="flex items-center gap-2">
-              <Flame className="h-4 w-4 text-[#10b981]" />
-              <span className="text-xs font-bold uppercase text-[#10b981] tracking-wider">Trade Setups Feed</span>
-            </div>
-            <h2 className="text-xl sm:text-2xl font-black text-white mt-1">
-              Institutional SMC Setups & Case Studies
-            </h2>
+        <div className="pb-3 border-b border-[#222222]">
+          <div className="flex items-center gap-2">
+            <Flame className="h-4 w-4 text-[#10b981]" />
+            <span className="text-xs font-bold uppercase text-[#10b981] tracking-wider">Trade Setups Feed</span>
           </div>
-          <Link
-            href="/courses"
-            className="text-xs font-bold text-[#10b981] hover:underline flex items-center gap-1"
-          >
-            <span>Learn these strategies</span>
-            <ChevronRight className="h-4 w-4" />
-          </Link>
+          <h2 className="text-xl sm:text-2xl font-black text-white mt-1">
+            Institutional SMC Setups & Case Studies
+          </h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
