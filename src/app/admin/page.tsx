@@ -747,46 +747,41 @@ export default function AdminPage() {
                       <tr>
                         <th className="py-3 px-3">Student</th>
                         <th className="py-3 px-3">Email</th>
-                        <th className="py-3 px-3">Forex SMC Access</th>
-                        <th className="py-3 px-3">Nifty Pro Access</th>
+                        {courses.map((c) => (
+                          <th key={c.id} className="py-3 px-3 whitespace-nowrap">
+                            {c.title}
+                          </th>
+                        ))}
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[#222222]">
-                      {students.map((student) => {
-                        const hasForex = student.enrolledCourses?.some((c) => c.courseId === 'course-forex-mastery');
-                        const hasNifty = student.enrolledCourses?.some((c) => c.courseId === 'course-nifty-banknifty');
+                      {students.map((student) => (
+                        <tr key={student.id} className="hover:bg-[#181818]">
+                          <td className="py-3 px-3 font-bold text-white whitespace-nowrap">{student.name}</td>
+                          <td className="py-3 px-3 font-mono text-[#a1a1aa] whitespace-nowrap">{student.email}</td>
+                          {courses.map((course) => {
+                            const hasAccess = student.enrolledCourses?.some(
+                              (c) => c.courseId === course.id || c.courseId === course.slug
+                            );
 
-                        return (
-                          <tr key={student.id} className="hover:bg-[#181818]">
-                            <td className="py-3 px-3 font-bold text-white">{student.name}</td>
-                            <td className="py-3 px-3 font-mono text-[#a1a1aa]">{student.email}</td>
-                            <td className="py-3 px-3">
-                              <button
-                                onClick={() => handleToggleAccess(student.id, 'course-forex-mastery', !!hasForex)}
-                                className={`px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${
-                                  hasForex
-                                    ? 'bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/40'
-                                    : 'bg-black text-[#a1a1aa] border border-[#222222] hover:text-white'
-                                }`}
-                              >
-                                {hasForex ? 'Granted ✓' : '+ Give Access'}
-                              </button>
-                            </td>
-                            <td className="py-3 px-3">
-                              <button
-                                onClick={() => handleToggleAccess(student.id, 'course-nifty-banknifty', !!hasNifty)}
-                                className={`px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${
-                                  hasNifty
-                                    ? 'bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/40'
-                                    : 'bg-black text-[#a1a1aa] border border-[#222222] hover:text-white'
-                                }`}
-                              >
-                                {hasNifty ? 'Granted ✓' : '+ Give Access'}
-                              </button>
-                            </td>
-                          </tr>
-                        );
-                      })}
+                            return (
+                              <td key={course.id} className="py-3 px-3 whitespace-nowrap">
+                                <button
+                                  onClick={() => handleToggleAccess(student.id, course.id, !!hasAccess)}
+                                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer flex items-center gap-1.5 ${
+                                    hasAccess
+                                      ? 'bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/40 hover:bg-rose-500/20 hover:text-rose-400 hover:border-rose-500/40'
+                                      : 'bg-black text-[#a1a1aa] border border-[#222222] hover:text-white hover:border-[#444444]'
+                                  }`}
+                                  title={hasAccess ? 'Click to revoke access' : 'Click to grant access'}
+                                >
+                                  {hasAccess ? 'Access Granted ✓' : '+ Grant Access'}
+                                </button>
+                              </td>
+                            );
+                          })}
+                        </tr>
+                      ))}
                     </tbody>
                   </table>
                 </div>
