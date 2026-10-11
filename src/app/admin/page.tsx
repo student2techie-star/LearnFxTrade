@@ -86,6 +86,9 @@ export default function AdminPage() {
     thumbnailUrl: '',
   });
 
+  // State to track selected course for granting access per student
+  const [selectedCoursePerStudent, setSelectedCoursePerStudent] = useState<Record<string, string>>({});
+
   // New Certificate Form State
   const [certForm, setCertForm] = useState({
     title: '',
@@ -93,6 +96,7 @@ export default function AdminPage() {
     amount: '',
     imageUrl: '',
   });
+
 
   // Fetch admin data
   const fetchData = async () => {
@@ -747,56 +751,87 @@ export default function AdminPage() {
                       <tr>
                         <th className="py-3 px-3">Student</th>
                         <th className="py-3 px-3">Email</th>
-                        <th className="py-3 px-3">1. Forex SMC Mastery</th>
-                        <th className="py-3 px-3">2. Nifty & BankNifty Pro</th>
+                        <th className="py-3 px-3">Currently Enrolled Courses</th>
+                        <th className="py-3 px-3">Grant New Course Access</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[#222222]">
                       {students.map((student) => {
-                        const hasForex = student.enrolledCourses?.some(
-                          (c) =>
-                            c.courseId === 'course-forex-mastery' ||
-                            c.courseId === 'forex-smart-money-concepts-mastery'
-                        );
-                        const hasNifty = student.enrolledCourses?.some(
-                          (c) =>
-                            c.courseId === 'course-nifty-banknifty' ||
-                            c.courseId === 'indian-market-options-price-action-pro'
+                        const chosenCourseId = selectedCoursePerStudent[student.id] || courses[0]?.id || '';
+                        const isChosenAlreadyEnrolled = student.enrolledCourses?.some(
+                          (c) => c.courseId === chosenCourseId
                         );
 
                         return (
                           <tr key={student.id} className="hover:bg-[#181818]">
-                            <td className="py-3.5 px-3 font-bold text-white whitespace-nowrap">{student.name}</td>
-                            <td className="py-3.5 px-3 font-mono text-[#a1a1aa] whitespace-nowrap">{student.email}</td>
-                            <td className="py-3.5 px-3 whitespace-nowrap">
-                              <button
-                                onClick={() =>
-                                  handleToggleAccess(student.id, 'course-forex-mastery', !!hasForex)
-                                }
-                                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer flex items-center gap-1.5 ${
-                                  hasForex
-                                    ? 'bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/40 hover:bg-rose-500/20 hover:text-rose-400 hover:border-rose-500/40'
-                                    : 'bg-black text-[#a1a1aa] border border-[#222222] hover:text-white hover:border-[#444444]'
-                                }`}
-                                title={hasForex ? 'Click to revoke Forex SMC access' : 'Click to grant Forex SMC access'}
-                              >
-                                {hasForex ? 'Forex Granted ✓' : '+ Grant Forex SMC'}
-                              </button>
+                            <td className="py-4 px-3 font-bold text-white whitespace-nowrap">{student.name}</td>
+                            <td className="py-4 px-3 font-mono text-[#a1a1aa] whitespace-nowrap">{student.email}</td>
+                            
+                            {/* List of currently enrolled courses with 1-click Revoke */}
+                            <td className="py-4 px-3">
+                              {student.enrolledCourses && student.enrolledCourses.length > 0 ? (
+                                <div className="flex flex-wrap gap-1.5 max-w-md">
+                                  {student.enrolledCourses.map((enr) => {
+                                    const matchingCourse = courses.find(
+                                      (c) => c.id === enr.courseId || c.slug === enr.courseId
+                                    );
+                                    const courseName = matchingCourse?.title || enr.title || enr.courseId;
+
+                                    return (
+                                      <span
+                                        key={enr.courseId}
+                                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#10b981]/15 border border-[#10b981]/30 text-[#10b981] text-[11px] font-bold"
+                                      >
+                                        <CheckCircle className="h-3 w-3 shrink-0" />
+                                        <span className="truncate max-w-[180px]">{courseName}</span>
+                                        <button
+                                          onClick={() => handleToggleAccess(student.id, enr.courseId, true)}
+                                          className="text-white/40 hover:text-rose-400 font-bold ml-1 text-xs cursor-pointer"
+                                          title="Revoke access"
+                                        >
+                                          ✕
+                                        </button>
+                                      </span>
+                                    );
+                                  })}
+                                </div>
+                              ) : (
+                                <span className="text-white/40 italic text-xs">No courses enrolled</span>
+                              )}
                             </td>
-                            <td className="py-3.5 px-3 whitespace-nowrap">
-                              <button
-                                onClick={() =>
-                                  handleToggleAccess(student.id, 'course-nifty-banknifty', !!hasNifty)
-                                }
-                                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer flex items-center gap-1.5 ${
-                                  hasNifty
-                                    ? 'bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/40 hover:bg-rose-500/20 hover:text-rose-400 hover:border-rose-500/40'
-                                    : 'bg-black text-[#a1a1aa] border border-[#222222] hover:text-white hover:border-[#444444]'
-                                }`}
-                                title={hasNifty ? 'Click to revoke Nifty Pro access' : 'Click to grant Nifty Pro access'}
-                              >
-                                {hasNifty ? 'Nifty Granted ✓' : '+ Grant Nifty Pro'}
-                              </button>
+
+                            {/* Dropdown selector to choose ANY of 100 courses and Grant */}
+                            <td className="py-4 px-3 whitespace-nowrap">
+                              <div className="flex items-center gap-2">
+                                <select
+                                  value={chosenCourseId}
+                                  onChange={(e) =>
+                                    setSelectedCoursePerStudent((prev) => ({
+                                      ...prev,
+                                      [student.id]: e.target.value,
+                                    }))
+                                  }
+                                  className="p-2 rounded-xl bg-black border border-[#222222] text-xs text-white focus:border-[#10b981] focus:outline-none max-w-[220px]"
+                                >
+                                  {courses.map((c) => (
+                                    <option key={c.id} value={c.id}>
+                                      {c.title}
+                                    </option>
+                                  ))}
+                                </select>
+
+                                <button
+                                  disabled={isChosenAlreadyEnrolled}
+                                  onClick={() => handleToggleAccess(student.id, chosenCourseId, false)}
+                                  className={`px-3 py-2 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1.5 ${
+                                    isChosenAlreadyEnrolled
+                                      ? 'bg-[#18181a] text-[#71717a] border border-[#27272a] cursor-not-allowed'
+                                      : 'bg-[#10b981] text-black hover:bg-[#059669]'
+                                  }`}
+                                >
+                                  {isChosenAlreadyEnrolled ? 'Already Enrolled' : '+ Grant Access'}
+                                </button>
+                              </div>
                             </td>
                           </tr>
                         );
@@ -804,6 +839,7 @@ export default function AdminPage() {
                     </tbody>
                   </table>
                 </div>
+
               </div>
             </div>
           )}
