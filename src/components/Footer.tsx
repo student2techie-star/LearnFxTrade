@@ -1,8 +1,18 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { TrendingUp, ShieldAlert, Award, ArrowUpRight } from 'lucide-react';
 
 export default function Footer() {
+  const pathname = usePathname();
+
+  // Do not render the website public footer on admin routes
+  if (pathname?.startsWith('/admin')) {
+    return null;
+  }
+
   return (
     <footer className="border-t border-[#222222] bg-black text-[#a1a1aa]">
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">

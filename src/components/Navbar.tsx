@@ -33,6 +33,11 @@ export default function Navbar() {
     { name: 'Help Desk', href: '/contact' },
   ];
 
+  // Do not render the website public navbar on admin routes
+  if (pathname?.startsWith('/admin')) {
+    return null;
+  }
+
   return (
     <header className="sticky top-0 z-50 w-full transition-all bg-black">
       {/* Main Pure Black Header */}
