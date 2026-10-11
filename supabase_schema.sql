@@ -113,25 +113,26 @@ ALTER TABLE public.certificates ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.offline_batches ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 
--- Read & Write Policies
+-- ==============================================================================
+-- Security Architecture (Industry Best Practice)
+-- ==============================================================================
+-- 1. PUBLIC READ: Anyone visiting your website can view published courses,
+--    payout certificates, and offline batch dates (SELECT ONLY).
+-- 2. SECURE WRITES: Modifying courses, granting access, and creating batches
+--    are restricted to server-side Next.js API routes using SUPABASE_SERVICE_ROLE_KEY
+--    (or authenticated admin sessions), preventing public tampering.
+
+-- Public Read Policies
 CREATE POLICY "Allow public read courses" ON public.courses FOR SELECT USING (true);
-CREATE POLICY "Allow public write courses" ON public.courses FOR ALL USING (true) WITH CHECK (true);
-
 CREATE POLICY "Allow public read certificates" ON public.certificates FOR SELECT USING (true);
-CREATE POLICY "Allow public write certificates" ON public.certificates FOR ALL USING (true) WITH CHECK (true);
-
 CREATE POLICY "Allow public read offline batches" ON public.offline_batches FOR SELECT USING (true);
-CREATE POLICY "Allow public write offline batches" ON public.offline_batches FOR ALL USING (true) WITH CHECK (true);
-
 CREATE POLICY "Allow public read lessons" ON public.lessons FOR SELECT USING (true);
-CREATE POLICY "Allow public write lessons" ON public.lessons FOR ALL USING (true) WITH CHECK (true);
-
 CREATE POLICY "Allow public read users" ON public.users FOR SELECT USING (true);
-CREATE POLICY "Allow public insert users" ON public.users FOR ALL USING (true) WITH CHECK (true);
-
 CREATE POLICY "Allow public read enrollments" ON public.enrollments FOR SELECT USING (true);
-CREATE POLICY "Allow public write enrollments" ON public.enrollments FOR ALL USING (true) WITH CHECK (true);
-
 CREATE POLICY "Allow public read orders" ON public.orders FOR SELECT USING (true);
-CREATE POLICY "Allow public write orders" ON public.orders FOR ALL USING (true) WITH CHECK (true);
+
+-- Student booking seat inserts & registration
+CREATE POLICY "Allow public insert users" ON public.users FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow public insert orders" ON public.orders FOR INSERT WITH CHECK (true);
+
 
