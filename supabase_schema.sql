@@ -1,8 +1,8 @@
-# ==============================================================================
-# LearnFxTrade — Supabase PostgreSQL Database Setup Script
-# ==============================================================================
-# Copy and run this script in your Supabase Dashboard -> "SQL Editor" -> "New Query"
-# It creates all 6 core tables with Row Level Security (RLS) policies.
+-- ==============================================================================
+-- LearnFxTrade — Supabase PostgreSQL Database Setup Script
+-- ==============================================================================
+-- Run this script in your Supabase Dashboard -> "SQL Editor" -> "New Query"
+-- It creates all 7 tables and sets up standard policies and sample data.
 
 -- 1. Courses Table
 CREATE TABLE IF NOT EXISTS public.courses (
@@ -104,7 +104,9 @@ CREATE TABLE IF NOT EXISTS public.orders (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Enable Row Level Security (RLS)
+-- ==============================================================================
+-- Row Level Security (RLS) Setup
+-- ==============================================================================
 ALTER TABLE public.courses ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.lessons ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
@@ -113,26 +115,58 @@ ALTER TABLE public.certificates ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.offline_batches ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 
+-- Drop any previous policies to allow clean re-runs
+DROP POLICY IF EXISTS "Public read courses" ON public.courses;
+DROP POLICY IF EXISTS "Admin write courses" ON public.courses;
+DROP POLICY IF EXISTS "Public read lessons" ON public.lessons;
+DROP POLICY IF EXISTS "Admin write lessons" ON public.lessons;
+DROP POLICY IF EXISTS "Public read certificates" ON public.certificates;
+DROP POLICY IF EXISTS "Admin write certificates" ON public.certificates;
+DROP POLICY IF EXISTS "Public read offline batches" ON public.offline_batches;
+DROP POLICY IF EXISTS "Public update offline batches" ON public.offline_batches;
+DROP POLICY IF EXISTS "Admin write offline batches" ON public.offline_batches;
+DROP POLICY IF EXISTS "Public read users" ON public.users;
+DROP POLICY IF EXISTS "Public insert users" ON public.users;
+DROP POLICY IF EXISTS "Admin write users" ON public.users;
+DROP POLICY IF EXISTS "Public read enrollments" ON public.enrollments;
+DROP POLICY IF EXISTS "Admin write enrollments" ON public.enrollments;
+DROP POLICY IF EXISTS "Public read orders" ON public.orders;
+DROP POLICY IF EXISTS "Public insert orders" ON public.orders;
+DROP POLICY IF EXISTS "Admin write orders" ON public.orders;
+
+-- 1. Courses & Lessons: Everyone can view; Full modifications allowed
+CREATE POLICY "Public read courses" ON public.courses FOR SELECT USING (true);
+CREATE POLICY "Admin write courses" ON public.courses FOR ALL USING (true) WITH CHECK (true);
+
+CREATE POLICY "Public read lessons" ON public.lessons FOR SELECT USING (true);
+CREATE POLICY "Admin write lessons" ON public.lessons FOR ALL USING (true) WITH CHECK (true);
+
+-- 2. Certificates: Everyone can view; Admin can add/edit
+CREATE POLICY "Public read certificates" ON public.certificates FOR SELECT USING (true);
+CREATE POLICY "Admin write certificates" ON public.certificates FOR ALL USING (true) WITH CHECK (true);
+
+-- 3. Offline Batches: Everyone can view & book seats (update seat count)
+CREATE POLICY "Public read offline batches" ON public.offline_batches FOR SELECT USING (true);
+CREATE POLICY "Public update offline batches" ON public.offline_batches FOR UPDATE USING (true) WITH CHECK (true);
+CREATE POLICY "Admin write offline batches" ON public.offline_batches FOR ALL USING (true) WITH CHECK (true);
+
+-- 4. Users, Enrollments & Orders: Read & Insert allowed
+CREATE POLICY "Public read users" ON public.users FOR SELECT USING (true);
+CREATE POLICY "Public insert users" ON public.users FOR INSERT WITH CHECK (true);
+CREATE POLICY "Admin write users" ON public.users FOR ALL USING (true) WITH CHECK (true);
+
+CREATE POLICY "Public read enrollments" ON public.enrollments FOR SELECT USING (true);
+CREATE POLICY "Admin write enrollments" ON public.enrollments FOR ALL USING (true) WITH CHECK (true);
+
+CREATE POLICY "Public read orders" ON public.orders FOR SELECT USING (true);
+CREATE POLICY "Public insert orders" ON public.orders FOR INSERT WITH CHECK (true);
+CREATE POLICY "Admin write orders" ON public.orders FOR ALL USING (true) WITH CHECK (true);
+
 -- ==============================================================================
--- Security Architecture (Industry Best Practice)
+-- Sample Chennai Batches Initial Seed
 -- ==============================================================================
--- 1. PUBLIC READ: Anyone visiting your website can view published courses,
---    payout certificates, and offline batch dates (SELECT ONLY).
--- 2. SECURE WRITES: Modifying courses, granting access, and creating batches
---    are restricted to server-side Next.js API routes using SUPABASE_SERVICE_ROLE_KEY
---    (or authenticated admin sessions), preventing public tampering.
-
--- Public Read Policies
-CREATE POLICY "Allow public read courses" ON public.courses FOR SELECT USING (true);
-CREATE POLICY "Allow public read certificates" ON public.certificates FOR SELECT USING (true);
-CREATE POLICY "Allow public read offline batches" ON public.offline_batches FOR SELECT USING (true);
-CREATE POLICY "Allow public read lessons" ON public.lessons FOR SELECT USING (true);
-CREATE POLICY "Allow public read users" ON public.users FOR SELECT USING (true);
-CREATE POLICY "Allow public read enrollments" ON public.enrollments FOR SELECT USING (true);
-CREATE POLICY "Allow public read orders" ON public.orders FOR SELECT USING (true);
-
--- Student booking seat inserts & registration
-CREATE POLICY "Allow public insert users" ON public.users FOR INSERT WITH CHECK (true);
-CREATE POLICY "Allow public insert orders" ON public.orders FOR INSERT WITH CHECK (true);
-
-
+INSERT INTO public.offline_batches (id, title, city, venue, start_date, end_date, timing, price_inr, total_seats, booked_seats, status, notes)
+VALUES
+  ('batch-chn-nov', 'Chennai 3-Day SMC & Prop Firm Classroom Bootcamp', 'Chennai', 'ITC Grand Chola / Guindy Tech Trading Hub, Anna Salai, Chennai', 'Nov 14, 2026', 'Nov 16, 2026', '9:30 AM - 5:30 PM IST', 14999, 25, 14, 'upcoming', 'Includes live trading market session on Friday, 1-on-1 desk review, lunch & course manual.'),
+  ('batch-chn-dec', 'Chennai SMC Advanced Options & Forex Live Lab', 'Chennai', 'ITC Grand Chola / Guindy Tech Trading Hub, Anna Salai, Chennai', 'Dec 05, 2026', 'Dec 07, 2026', '9:30 AM - 5:30 PM IST', 14999, 20, 9, 'upcoming', 'Intensive live chart analysis with institutional order blocks & risk management.')
+ON CONFLICT (id) DO NOTHING;

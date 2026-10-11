@@ -16,6 +16,8 @@ import {
   Phone,
   Mail,
   User,
+  AlertTriangle,
+  CreditCard,
 } from 'lucide-react';
 
 interface OfflineBatch {
@@ -27,6 +29,7 @@ interface OfflineBatch {
   endDate: string;
   timing: string;
   priceInr: number;
+  advanceFeeInr?: number;
   totalSeats: number;
   bookedSeats: number;
   status: 'upcoming' | 'ongoing' | 'completed' | 'sold_out';
@@ -211,7 +214,12 @@ export default function OfflineClassesPage() {
                         <div className="text-2xl font-black text-white font-mono">
                           ₹{b.priceInr.toLocaleString('en-IN')}
                         </div>
-                        <span className="text-[11px] text-[#a1a1aa]">All-Inclusive</span>
+                        <span className="text-[11px] text-[#a1a1aa] block">Total Fee</span>
+                        {b.advanceFeeInr ? (
+                          <span className="inline-block mt-1 px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-[10px] font-bold text-emerald-400">
+                            Lock with ₹{b.advanceFeeInr.toLocaleString('en-IN')} Advance
+                          </span>
+                        ) : null}
                       </div>
                     </div>
 
@@ -385,25 +393,73 @@ export default function OfflineClassesPage() {
                   />
                 </div>
 
-                <div className="p-3 rounded-xl bg-black/60 border border-[#222222] text-[11px] text-[#a1a1aa] space-y-1">
-                  <div className="flex justify-between">
-                    <span>Batch Fee:</span>
-                    <strong className="text-white font-mono">₹{bookingModalBatch.priceInr}</strong>
+                {/* Minimum Advance Deposit Required & Opportunity Warning */}
+                {bookingModalBatch.advanceFeeInr ? (
+                  <div className="rounded-2xl border border-amber-500/40 bg-amber-950/25 p-3.5 space-y-2">
+                    <div className="flex items-start gap-2.5">
+                      <AlertTriangle className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
+                      <div className="space-y-1">
+                        <span className="font-bold text-amber-300 text-xs block">
+                          Mandatory Advance Booking Deposit: ₹{bookingModalBatch.advanceFeeInr.toLocaleString('en-IN')}
+                        </span>
+                        <p className="text-[11px] text-amber-200/90 leading-relaxed">
+                          Because classroom seats are strictly capped at {bookingModalBatch.totalSeats} desks, your seat reservation is locked with a minimum advance of <strong className="text-white">₹{bookingModalBatch.advanceFeeInr.toLocaleString('en-IN')}</strong> (remaining balance payable at venue check-in).
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="rounded-xl bg-black/60 p-2.5 border border-amber-500/30 text-[10px] text-amber-300/80 leading-normal">
+                      ⚠️ <strong>Seat Commitment Notice:</strong> If you register and fail to attend, it denies another aspiring trader the opportunity to join this batch. Please book only if you are confirmed to attend.
+                    </div>
                   </div>
+                ) : null}
+
+                <div className="p-3.5 rounded-xl bg-black/60 border border-[#222222] text-[11px] text-[#a1a1aa] space-y-1.5">
                   <div className="flex justify-between">
+                    <span>Total Program Fee:</span>
+                    <strong className="text-white font-mono">₹{bookingModalBatch.priceInr.toLocaleString('en-IN')}</strong>
+                  </div>
+                  {bookingModalBatch.advanceFeeInr ? (
+                    <div className="flex justify-between text-emerald-400">
+                      <span>Minimum Advance to Reserve Now:</span>
+                      <strong className="font-mono font-bold">₹{bookingModalBatch.advanceFeeInr.toLocaleString('en-IN')}</strong>
+                    </div>
+                  ) : null}
+                  <div className="flex justify-between pt-1 border-t border-[#1c1c1c]">
                     <span>Seats Remaining:</span>
                     <strong className="text-[#10b981]">
-                      {bookingModalBatch.totalSeats - bookingModalBatch.bookedSeats} seats
+                      {bookingModalBatch.totalSeats - bookingModalBatch.bookedSeats} seats left
                     </strong>
                   </div>
+                </div>
+
+                <div className="flex items-start gap-2 pt-1 text-[11px] text-slate-300">
+                  <input
+                    type="checkbox"
+                    id="advanceAgreement"
+                    required
+                    className="mt-0.5 rounded border-[#333333] accent-emerald-500"
+                  />
+                  <label htmlFor="advanceAgreement" className="cursor-pointer text-[10.5px] leading-tight">
+                    I understand that seats are limited and commit to paying the minimum advance of{' '}
+                    <strong className="text-emerald-400">
+                      ₹{bookingModalBatch.advanceFeeInr || 2999}
+                    </strong>{' '}
+                    to lock my classroom desk and not deny another student this opportunity.
+                  </label>
                 </div>
 
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full py-3.5 rounded-xl bg-[#10b981] hover:bg-[#059669] text-black font-black text-xs transition cursor-pointer shadow-lg shadow-[#10b981]/20"
+                  className="w-full py-3.5 rounded-xl bg-[#10b981] hover:bg-[#059669] text-black font-black text-xs transition cursor-pointer shadow-lg shadow-[#10b981]/20 flex items-center justify-center gap-2"
                 >
-                  {isSubmitting ? 'Reserving Seat...' : 'Confirm Seat Booking'}
+                  <CreditCard className="h-4 w-4" />
+                  <span>
+                    {isSubmitting
+                      ? 'Reserving Seat...'
+                      : `Confirm & Lock Seat with ₹${bookingModalBatch.advanceFeeInr || 2999} Advance`}
+                  </span>
                 </button>
               </form>
             )}

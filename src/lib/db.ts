@@ -1,82 +1,15 @@
 import { Course, Lesson, PayoutCertificate, User, Order, Enrollment, LessonProgress, OfflineBatch } from './types';
-import { INITIAL_COURSES, INITIAL_LESSONS, INITIAL_CERTIFICATES, INITIAL_USERS, INITIAL_ENROLLMENTS, INITIAL_ORDERS } from './mock-data';
-
-// Initial sample offline batches for Chennai across different dates
-const INITIAL_OFFLINE_BATCHES: OfflineBatch[] = [
-  {
-    id: 'batch-chn-01',
-    title: 'Batch 01: 3-Day Institutional SMC & Forex Masterclass',
-    city: 'Chennai',
-    venue: 'ITC Grand Chola / Guindy Tech Trading Hub, Chennai',
-    startDate: 'Nov 20, 2026',
-    endDate: 'Nov 22, 2026',
-    timing: '9:30 AM - 5:30 PM IST',
-    priceInr: 14999,
-    totalSeats: 25,
-    bookedSeats: 19,
-    status: 'upcoming',
-    notes: 'Live London session execution + Prop firm evaluation challenge passing framework. Printed SOP handbook and meals provided.',
-    enrolledStudents: ['Karthik Raman', 'Priya Sundaram', 'Vignesh K'],
-  },
-  {
-    id: 'batch-chn-02',
-    title: 'Batch 02: Nifty & BankNifty Live Price Action Floor',
-    city: 'Chennai',
-    venue: 'ITC Grand Chola / Guindy Tech Trading Hub, Chennai',
-    startDate: 'Dec 11, 2026',
-    endDate: 'Dec 13, 2026',
-    timing: '9:15 AM - 4:30 PM IST',
-    priceInr: 14999,
-    totalSeats: 25,
-    bookedSeats: 16,
-    status: 'upcoming',
-    notes: 'Live trading during Indian market hours. Master Central Pivot Range (CPR), Open Interest (OI) traps, and Option Buying.',
-    enrolledStudents: ['Sanjay Narayanan', 'Divya Balaji'],
-  },
-  {
-    id: 'batch-chn-03',
-    title: 'Batch 03: Complete Institutional SMC & Index Option Trading',
-    city: 'Chennai',
-    venue: 'ITC Grand Chola / Guindy Tech Trading Hub, Chennai',
-    startDate: 'Jan 08, 2027',
-    endDate: 'Jan 10, 2027',
-    timing: '9:30 AM - 5:30 PM IST',
-    priceInr: 15999,
-    totalSeats: 30,
-    bookedSeats: 12,
-    status: 'upcoming',
-    notes: 'Combined intensive 3-day boot camp covering both Forex Smart Money Concepts & Nifty Index derivatives.',
-    enrolledStudents: ['Arun Kumar', 'Meena Rajan', 'Harish V'],
-  },
-  {
-    id: 'batch-chn-04',
-    title: 'Batch 04: Elite Funded Trader Drawdown & Scalping Lab',
-    city: 'Chennai',
-    venue: 'ITC Grand Chola / Guindy Tech Trading Hub, Chennai',
-    startDate: 'Jan 29, 2027',
-    endDate: 'Jan 31, 2027',
-    timing: '9:30 AM - 5:30 PM IST',
-    priceInr: 14999,
-    totalSeats: 20,
-    bookedSeats: 6,
-    status: 'upcoming',
-    notes: 'Exclusive small-group intensive session focusing on strict risk mathematics, clearing FTMO/FundedNext accounts, and emotional control.',
-    enrolledStudents: ['Rajesh Mohan'],
-  },
-];
-
-
 
 // Persistent local storage simulator for server routes and client side
 class DataStore {
-  private courses: Course[] = [...INITIAL_COURSES];
-  private lessons: Lesson[] = [...INITIAL_LESSONS];
-  private certificates: PayoutCertificate[] = [...INITIAL_CERTIFICATES];
-  private users: User[] = [...INITIAL_USERS];
-  private enrollments: Enrollment[] = [...INITIAL_ENROLLMENTS];
-  private orders: Order[] = [...INITIAL_ORDERS];
+  private courses: Course[] = [];
+  private lessons: Lesson[] = [];
+  private certificates: PayoutCertificate[] = [];
+  private users: User[] = [];
+  private enrollments: Enrollment[] = [];
+  private orders: Order[] = [];
   private progress: LessonProgress[] = [];
-  private offlineBatches: OfflineBatch[] = [...INITIAL_OFFLINE_BATCHES];
+  private offlineBatches: OfflineBatch[] = [];
 
 
   // Courses
@@ -327,7 +260,7 @@ class DataStore {
   }
 
   resetOfflineBatches(): void {
-    this.offlineBatches = [...INITIAL_OFFLINE_BATCHES];
+    this.offlineBatches = [];
   }
 }
 

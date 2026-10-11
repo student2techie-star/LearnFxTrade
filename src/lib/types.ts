@@ -101,6 +101,7 @@ export interface OfflineBatch {
   priceInr: number;
   totalSeats: number;
   bookedSeats: number;
+  advanceFeeInr?: number; // Minimum advance booking fee to lock seat
   status: 'upcoming' | 'ongoing' | 'completed' | 'sold_out';
   notes?: string;
   enrolledStudents?: string[]; // Student names or IDs

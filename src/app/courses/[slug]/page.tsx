@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { notFound, useParams } from 'next/navigation';
-import { INITIAL_COURSES, INITIAL_LESSONS } from '@/lib/mock-data';
+import { Course, Lesson } from '@/lib/types';
 import { useAuth } from '@/lib/auth-context';
 import CheckoutModal from '@/components/CheckoutModal';
 import Link from 'next/link';
@@ -24,8 +24,31 @@ export default function CourseDetailPage() {
   const slug = params?.slug as string;
   const { isEnrolled } = useAuth();
   const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [course, setCourse] = useState<Course | null>(null);
+  const [lessons, setLessons] = useState<Lesson[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const course = INITIAL_COURSES.find((c) => c.slug === slug || c.id === slug);
+  useEffect(() => {
+    fetch('/api/courses')
+      .then((res) => res.json())
+      .then((data) => {
+        const found = (data.courses || []).find(
+          (c: Course) => c.slug === slug || c.id === slug
+        );
+        if (found) setCourse(found);
+      })
+      .catch((err) => console.error(err))
+      .finally(() => setLoading(false));
+  }, [slug]);
+
+  if (loading) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-emerald-500 border-t-transparent" />
+      </div>
+    );
+  }
+
   if (!course) {
     return (
       <div className="mx-auto max-w-3xl py-24 text-center px-4 space-y-4">
@@ -37,7 +60,6 @@ export default function CourseDetailPage() {
     );
   }
 
-  const lessons = INITIAL_LESSONS.filter((l) => l.courseId === course.id);
   const enrolled = isEnrolled(course.id);
   const firstPreviewLesson = lessons.find((l) => l.isFreePreview) || lessons[0];
 

@@ -23,6 +23,9 @@ import {
   MapPin,
   Calendar,
   Clock,
+  UserCheck,
+  Search,
+  Filter,
 } from 'lucide-react';
 
 interface Course {
@@ -72,6 +75,7 @@ interface OfflineBatch {
   endDate: string;
   timing: string;
   priceInr: number;
+  advanceFeeInr?: number;
   totalSeats: number;
   bookedSeats: number;
   status: 'upcoming' | 'ongoing' | 'completed' | 'sold_out';
@@ -80,7 +84,7 @@ interface OfflineBatch {
 }
 
 export default function AdminPage() {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'courses' | 'certificates' | 'students' | 'offline' | 'orders'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'courses' | 'certificates' | 'students' | 'offline' | 'offline_students' | 'orders'>('dashboard');
   const [collapsed, setCollapsed] = useState(false);
   const [courses, setCourses] = useState<Course[]>([]);
   const [certificates, setCertificates] = useState<Certificate[]>([]);
@@ -89,6 +93,10 @@ export default function AdminPage() {
   const [offlineBatches, setOfflineBatches] = useState<OfflineBatch[]>([]);
   const [metrics, setMetrics] = useState({ revenue: 0, studentsCount: 0, coursesCount: 0, certsCount: 0, ordersCount: 0, batchesCount: 0 });
   const [loading, setLoading] = useState(true);
+
+  // Offline Students Filter States
+  const [selectedBatchDateFilter, setSelectedBatchDateFilter] = useState<string>('all');
+  const [offlineStudentSearch, setOfflineStudentSearch] = useState<string>('');
 
   // New Offline Batch Form State
   const [batchForm, setBatchForm] = useState({
@@ -99,6 +107,7 @@ export default function AdminPage() {
     endDate: '',
     timing: '9:30 AM - 5:30 PM',
     priceInr: 14999,
+    advanceFeeInr: 2999,
     totalSeats: 25,
     notes: '',
   });
@@ -309,12 +318,13 @@ export default function AdminPage() {
         alert('Offline Batch created successfully!');
         setBatchForm({
           title: '',
-          city: 'Bengaluru',
-          venue: '',
+          city: 'Chennai',
+          venue: 'ITC Grand Chola / Guindy Tech Trading Hub, Chennai',
           startDate: '',
           endDate: '',
           timing: '9:30 AM - 5:30 PM',
           priceInr: 14999,
+          advanceFeeInr: 2999,
           totalSeats: 25,
           notes: '',
         });
@@ -340,10 +350,16 @@ export default function AdminPage() {
     }
   };
 
+  const totalOfflineAttendees = offlineBatches.reduce(
+    (acc, b) => acc + (b.enrolledStudents ? b.enrolledStudents.length : b.bookedSeats),
+    0
+  );
+
   const navItems = [
     { key: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, count: null },
     { key: 'courses', label: 'Courses', icon: BookOpen, count: courses.length },
     { key: 'offline', label: 'Offline Batches', icon: MapPin, count: offlineBatches.length },
+    { key: 'offline_students', label: 'Offline Registered Students', icon: UserCheck, count: totalOfflineAttendees },
     { key: 'certificates', label: 'Certificates', icon: Award, count: certificates.length },
     { key: 'students', label: 'Students Access', icon: Users, count: students.length },
     { key: 'orders', label: 'Orders & Payments', icon: CreditCard, count: orders.length },
@@ -1013,7 +1029,7 @@ export default function AdminPage() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
                     <div className="space-y-1 sm:col-span-2">
                       <label className="text-white font-semibold flex items-center gap-1">
                         <MapPin className="h-3.5 w-3.5 text-[#10b981]" /> Venue / Hotel Address *
@@ -1029,7 +1045,7 @@ export default function AdminPage() {
                     </div>
 
                     <div className="space-y-1">
-                      <label className="text-white font-semibold">Fee per Student (INR) *</label>
+                      <label className="text-white font-semibold">Total Fee (₹) *</label>
                       <input
                         type="number"
                         required
@@ -1037,6 +1053,21 @@ export default function AdminPage() {
                         onChange={(e) => setBatchForm({ ...batchForm, priceInr: Number(e.target.value) })}
                         className="w-full p-2.5 rounded-xl bg-black border border-[#222222] text-white focus:border-[#10b981] focus:outline-none font-mono"
                       />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-emerald-400 font-semibold flex items-center gap-1">
+                        Advance Deposit (₹) *
+                      </label>
+                      <input
+                        type="number"
+                        required
+                        placeholder="e.g. 2999"
+                        value={batchForm.advanceFeeInr}
+                        onChange={(e) => setBatchForm({ ...batchForm, advanceFeeInr: Number(e.target.value) })}
+                        className="w-full p-2.5 rounded-xl bg-black border border-emerald-500/40 text-emerald-400 focus:border-emerald-400 focus:outline-none font-mono font-bold"
+                      />
+                      <span className="text-[10px] text-[#71717a] block">Min advance to reserve seat</span>
                     </div>
                   </div>
 
@@ -1129,6 +1160,11 @@ export default function AdminPage() {
                             <div className="text-right shrink-0">
                               <span className="text-base font-black text-white font-mono">₹{b.priceInr.toLocaleString('en-IN')}</span>
                               <div className="text-[10px] text-[#a1a1aa]">Per Seat</div>
+                              {b.advanceFeeInr ? (
+                                <span className="inline-block px-2 py-0.5 mt-1 rounded bg-emerald-500/15 border border-emerald-500/30 text-[10px] font-bold text-emerald-400">
+                                  Min Advance: ₹{b.advanceFeeInr.toLocaleString('en-IN')}
+                                </span>
+                              ) : null}
                             </div>
                           </div>
 
@@ -1204,8 +1240,197 @@ export default function AdminPage() {
             </div>
           )}
 
-          {/* TAB: ORDERS & PAYMENTS */}
+          {/* TAB: OFFLINE REGISTERED STUDENTS (WITH DATE FILTER) */}
+          {activeTab === 'offline_students' && (
+            <div className="space-y-6">
+              {/* Header & Filter Controls Bar */}
+              <div className="rounded-2xl border border-[#222222] bg-[#111111] p-6 space-y-4">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#222222] pb-4">
+                  <div>
+                    <h2 className="text-base font-bold text-white flex items-center gap-2">
+                      <UserCheck className="h-5 w-5 text-[#10b981]" /> Offline Registered Students Roster
+                    </h2>
+                    <p className="text-xs text-[#a1a1aa] mt-0.5">
+                      View all students registered for in-person classroom workshops and filter by class schedule dates.
+                    </p>
+                  </div>
 
+                  <div className="flex items-center gap-2">
+                    <span className="px-3 py-1 rounded-lg text-xs font-bold bg-[#10b981]/15 text-[#10b981] border border-[#10b981]/30">
+                      Total Attendees: {totalOfflineAttendees}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Filter and Search Bar */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
+                  {/* Date / Batch Filter Dropdown */}
+                  <div className="space-y-1">
+                    <label className="text-xs text-[#a1a1aa] font-semibold flex items-center gap-1.5">
+                      <Filter className="h-3.5 w-3.5 text-[#10b981]" /> Filter by Class Dates:
+                    </label>
+                    <select
+                      value={selectedBatchDateFilter}
+                      onChange={(e) => setSelectedBatchDateFilter(e.target.value)}
+                      className="w-full p-2.5 rounded-xl bg-black border border-[#222222] text-xs font-semibold text-white focus:border-[#10b981] focus:outline-none"
+                    >
+                      <option value="all">All Scheduled Batches & Dates ({offlineBatches.length})</option>
+                      {offlineBatches.map((b) => (
+                        <option key={b.id} value={b.id}>
+                          {b.startDate} to {b.endDate} — {b.city} ({b.bookedSeats} booked)
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Student Search */}
+                  <div className="space-y-1 md:col-span-2">
+                    <label className="text-xs text-[#a1a1aa] font-semibold flex items-center gap-1.5">
+                      <Search className="h-3.5 w-3.5 text-[#10b981]" /> Search Student Name / Contact:
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        placeholder="Search student name, email, or phone number..."
+                        value={offlineStudentSearch}
+                        onChange={(e) => setOfflineStudentSearch(e.target.value)}
+                        className="w-full p-2.5 pl-9 rounded-xl bg-black border border-[#222222] text-xs text-white placeholder-[#71717a] focus:border-[#10b981] focus:outline-none"
+                      />
+                      <Search className="absolute left-3 top-3 h-3.5 w-3.5 text-[#71717a]" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Batches & Students Breakdown */}
+              {(() => {
+                const filteredBatches = offlineBatches.filter((b) => {
+                  if (selectedBatchDateFilter !== 'all' && b.id !== selectedBatchDateFilter) {
+                    return false;
+                  }
+                  return true;
+                });
+
+                if (filteredBatches.length === 0) {
+                  return (
+                    <div className="rounded-2xl border border-[#222222] bg-[#111111] p-12 text-center text-xs text-[#a1a1aa]">
+                      No offline batches found matching the selected date filter.
+                    </div>
+                  );
+                }
+
+                return (
+                  <div className="space-y-6">
+                    {filteredBatches.map((batch) => {
+                      const allAttendees = batch.enrolledStudents || [];
+                      const filteredAttendees = allAttendees.filter((studentStr) =>
+                        studentStr.toLowerCase().includes(offlineStudentSearch.toLowerCase())
+                      );
+
+                      return (
+                        <div
+                          key={batch.id}
+                          className="rounded-2xl border border-[#222222] bg-[#111111] overflow-hidden"
+                        >
+                          {/* Batch Header Bar */}
+                          <div className="bg-[#141416] p-4 sm:p-5 border-b border-[#222222] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div className="space-y-1">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-[#10b981]/15 border border-[#10b981]/30 text-[#10b981] text-[10px] font-bold uppercase">
+                                  <MapPin className="h-3 w-3" /> {batch.city}
+                                </span>
+                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-amber-500/15 border border-amber-500/30 text-amber-400 text-[10px] font-bold">
+                                  <Calendar className="h-3 w-3" /> {batch.startDate} – {batch.endDate}
+                                </span>
+                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-slate-800 text-slate-300 text-[10px] font-medium">
+                                  <Clock className="h-3 w-3" /> {batch.timing}
+                                </span>
+                              </div>
+                              <h3 className="text-base font-bold text-white pt-1">{batch.title}</h3>
+                              <p className="text-xs text-[#a1a1aa] flex items-center gap-1.5">
+                                <MapPin className="h-3.5 w-3.5 text-[#10b981] shrink-0" /> {batch.venue}
+                              </p>
+                            </div>
+
+                            {/* Batch Stats */}
+                            <div className="flex items-center gap-4 bg-black/60 p-3 rounded-xl border border-[#222222] shrink-0 self-start sm:self-auto">
+                              <div>
+                                <div className="text-lg font-black text-white">{batch.bookedSeats} / {batch.totalSeats}</div>
+                                <div className="text-[10px] text-[#a1a1aa]">Seats Filled</div>
+                              </div>
+                              <div className="h-7 w-px bg-[#222222]" />
+                              <div>
+                                <div className="text-lg font-black text-[#10b981]">{Math.max(0, batch.totalSeats - batch.bookedSeats)}</div>
+                                <div className="text-[10px] text-[#a1a1aa]">Seats Left</div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Student Attendees List Table */}
+                          {filteredAttendees.length > 0 ? (
+                            <div className="overflow-x-auto">
+                              <table className="w-full text-left text-xs">
+                                <thead>
+                                  <tr className="border-b border-[#222222] bg-black/40 text-[11px] font-bold text-[#a1a1aa] uppercase tracking-wider">
+                                    <th className="px-5 py-3 w-12">#</th>
+                                    <th className="px-5 py-3">Student Name</th>
+                                    <th className="px-5 py-3">Registered Contact Info</th>
+                                    <th className="px-5 py-3">Batch Dates</th>
+                                    <th className="px-5 py-3">Attendance Status</th>
+                                  </tr>
+                                </thead>
+                                <tbody className="divide-y divide-[#1e1e22]">
+                                  {filteredAttendees.map((rawName, idx) => {
+                                    // Parse format "Rahul Sharma (student@example.com)" or plain name
+                                    const match = rawName.match(/^(.*?)\s*\((.*?)\)$/);
+                                    const studentName = match ? match[1].trim() : rawName;
+                                    const studentContact = match ? match[2].trim() : 'Registered on portal';
+
+                                    return (
+                                      <tr key={idx} className="hover:bg-[#141416] transition">
+                                        <td className="px-5 py-3.5 text-[#71717a] font-mono font-bold">
+                                          {idx + 1}
+                                        </td>
+                                        <td className="px-5 py-3.5 font-bold text-white flex items-center gap-2">
+                                          <div className="h-7 w-7 rounded-full bg-[#10b981]/20 border border-[#10b981]/30 text-[#10b981] flex items-center justify-center font-black text-[11px]">
+                                            {studentName.charAt(0).toUpperCase()}
+                                          </div>
+                                          <span>{studentName}</span>
+                                        </td>
+                                        <td className="px-5 py-3.5 text-slate-300 font-mono text-[11px]">
+                                          {studentContact}
+                                        </td>
+                                        <td className="px-5 py-3.5 text-[#a1a1aa]">
+                                          <span className="font-semibold text-white">{batch.startDate}</span> to {batch.endDate}
+                                        </td>
+                                        <td className="px-5 py-3.5">
+                                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#10b981]/15 text-[#10b981] border border-[#10b981]/30">
+                                            <CheckCircle className="h-3 w-3" /> Confirmed Seat
+                                          </span>
+                                        </td>
+                                      </tr>
+                                    );
+                                  })}
+                                </tbody>
+                              </table>
+                            </div>
+                          ) : (
+                            <div className="p-8 text-center text-xs text-[#a1a1aa]">
+                              {allAttendees.length === 0
+                                ? 'No student bookings registered for this batch yet.'
+                                : 'No students found matching your search query.'}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
+            </div>
+          )}
+
+          {/* TAB: ORDERS & PAYMENTS */}
           {activeTab === 'orders' && (
             <div className="space-y-4">
               <div className="rounded-2xl border border-[#222222] bg-[#111111] p-6 space-y-4">

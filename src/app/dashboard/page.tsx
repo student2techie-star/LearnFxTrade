@@ -1,8 +1,8 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
-import { INITIAL_COURSES, INITIAL_ORDERS } from '@/lib/mock-data';
+import { Course, Order } from '@/lib/types';
 import Link from 'next/link';
 import {
   GraduationCap,
@@ -19,6 +19,17 @@ import {
 
 export default function StudentDashboardPage() {
   const { user, enrolledCourseIds, isLoading } = useAuth();
+  const [allCourses, setAllCourses] = useState<Course[]>([]);
+  const [userOrders, setUserOrders] = useState<Order[]>([]);
+
+  useEffect(() => {
+    fetch('/api/courses')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.courses) setAllCourses(data.courses);
+      })
+      .catch((err) => console.error(err));
+  }, []);
 
   if (isLoading) {
     return (
@@ -46,7 +57,7 @@ export default function StudentDashboardPage() {
     );
   }
 
-  const enrolledCourses = INITIAL_COURSES.filter((c) =>
+  const enrolledCourses = allCourses.filter((c) =>
     enrolledCourseIds.includes(c.id)
   );
 
@@ -69,16 +80,25 @@ export default function StudentDashboardPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-4 bg-slate-950/80 p-4 rounded-2xl border border-slate-800 shrink-0">
-          <div>
-            <div className="text-2xl font-black text-white">{enrolledCourses.length}</div>
-            <div className="text-xs text-slate-400">Enrolled Courses</div>
+        <div className="flex flex-wrap items-center gap-4">
+          <div className="flex items-center gap-4 bg-slate-950/80 p-4 rounded-2xl border border-slate-800 shrink-0">
+            <div>
+              <div className="text-2xl font-black text-white">{enrolledCourses.length}</div>
+              <div className="text-xs text-slate-400">Enrolled Courses</div>
+            </div>
+            <div className="h-8 w-px bg-slate-800" />
+            <div>
+              <div className="text-2xl font-black text-emerald-400">Active</div>
+              <div className="text-xs text-slate-400">Lifetime Access</div>
+            </div>
           </div>
-          <div className="h-8 w-px bg-slate-800" />
-          <div>
-            <div className="text-2xl font-black text-emerald-400">Active</div>
-            <div className="text-xs text-slate-400">Lifetime Access</div>
-          </div>
+
+          <Link
+            href="/profile"
+            className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-[#141414] hover:bg-[#1f1f1f] border border-[#2a2a2a] text-xs font-bold text-white hover:text-emerald-400 transition shrink-0"
+          >
+            Edit Profile & Password
+          </Link>
         </div>
       </div>
 
@@ -184,21 +204,29 @@ export default function StudentDashboardPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/60 text-slate-300">
-                {INITIAL_ORDERS.map((order) => (
-                  <tr key={order.id} className="hover:bg-slate-800/30">
-                    <td className="py-3 px-4 font-mono text-emerald-400">{order.razorpayOrderId}</td>
-                    <td className="py-3 px-4 font-medium">{order.courseTitle}</td>
-                    <td className="py-3 px-4 font-bold text-white">₹{order.amount.toLocaleString('en-IN')}</td>
-                    <td className="py-3 px-4">
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                        {order.status.toUpperCase()}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4 text-emerald-400 hover:underline cursor-pointer">
-                      Download Receipt
+                {userOrders.length > 0 ? (
+                  userOrders.map((order) => (
+                    <tr key={order.id} className="hover:bg-slate-800/30">
+                      <td className="py-3 px-4 font-mono text-emerald-400">{order.razorpayOrderId}</td>
+                      <td className="py-3 px-4 font-medium">{order.courseTitle}</td>
+                      <td className="py-3 px-4 font-bold text-white">₹{order.amount.toLocaleString('en-IN')}</td>
+                      <td className="py-3 px-4">
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                          {order.status.toUpperCase()}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-emerald-400 hover:underline cursor-pointer">
+                        Download Receipt
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={5} className="py-6 text-center text-slate-500">
+                      No payment transactions recorded yet.
                     </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
           </div>

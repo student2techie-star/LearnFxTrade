@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
-import { INITIAL_COURSES, INITIAL_LESSONS } from '@/lib/mock-data';
+import { Course, Lesson } from '@/lib/types';
 import { useAuth } from '@/lib/auth-context';
 import VideoPlayer from '@/components/VideoPlayer';
 import Link from 'next/link';
@@ -25,20 +25,42 @@ export default function CoursePlayerPage() {
   const initialLessonId = searchParams?.get('lesson');
 
   const { isEnrolled, user } = useAuth();
+  const [course, setCourse] = useState<Course | null>(null);
+  const [lessons, setLessons] = useState<Lesson[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const course = INITIAL_COURSES.find(
-    (c) => c.slug === courseSlug || c.id === courseSlug
-  );
-
-  const lessons = INITIAL_LESSONS.filter(
-    (l) => l.courseId === (course?.id || courseSlug)
-  );
-
-  const [activeLessonId, setActiveLessonId] = useState<string>(
-    initialLessonId || (lessons[0]?.id ?? '')
-  );
-
+  const [activeLessonId, setActiveLessonId] = useState<string>(initialLessonId || '');
   const [completedLessonIds, setCompletedLessonIds] = useState<string[]>([]);
+
+  useEffect(() => {
+    fetch('/api/admin/manage')
+      .then((res) => res.json())
+      .then((data) => {
+        const foundCourse = (data.courses || []).find(
+          (c: Course) => c.slug === courseSlug || c.id === courseSlug
+        );
+        if (foundCourse) {
+          setCourse(foundCourse);
+          const courseLessons = (data.lessons || []).filter(
+            (l: Lesson) => l.courseId === foundCourse.id
+          );
+          setLessons(courseLessons);
+          if (!activeLessonId && courseLessons.length > 0) {
+            setActiveLessonId(courseLessons[0].id);
+          }
+        }
+      })
+      .catch((err) => console.error(err))
+      .finally(() => setLoading(false));
+  }, [courseSlug, activeLessonId]);
+
+  if (loading) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-emerald-500 border-t-transparent" />
+      </div>
+    );
+  }
 
   if (!course) {
     return (

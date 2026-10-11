@@ -11,7 +11,8 @@ import {
   LogOut,
   Menu,
   X,
-  GraduationCap
+  GraduationCap,
+  User
 } from 'lucide-react';
 
 
@@ -112,10 +113,19 @@ export default function Navbar() {
 
                 <Link
                   href="/dashboard"
-                  className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-full bg-[#111111] text-white border border-[#222222] hover:bg-[#1c1c1c] transition"
+                  className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-full bg-[#111111] text-white border border-[#222222] hover:bg-[#1c1c1c] transition"
                 >
-                  <GraduationCap className="h-4 w-4 text-[#10b981]" />
+                  <GraduationCap className="h-3.5 w-3.5 text-[#10b981]" />
                   <span>My Classroom</span>
+                </Link>
+
+                <Link
+                  href="/profile"
+                  className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-full bg-[#111111] text-white/90 border border-[#222222] hover:bg-[#1c1c1c] hover:text-emerald-400 transition"
+                  title="Profile & Settings"
+                >
+                  <User className="h-3.5 w-3.5 text-emerald-400" />
+                  <span>Profile</span>
                 </Link>
 
                 <button
@@ -180,7 +190,14 @@ export default function Navbar() {
                   onClick={() => setMobileMenuOpen(false)}
                   className="flex items-center gap-2 px-3 py-2 text-sm font-bold rounded-lg bg-[#111111] text-white"
                 >
-                  <GraduationCap className="h-4 w-4 text-[#10b981]" /> My Dashboard
+                  <GraduationCap className="h-4 w-4 text-[#10b981]" /> My Classroom
+                </Link>
+                <Link
+                  href="/profile"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-2 px-3 py-2 text-sm font-bold rounded-lg bg-[#111111] text-white hover:text-emerald-400"
+                >
+                  <User className="h-4 w-4 text-emerald-400" /> Profile & Settings
                 </Link>
                 <button
                   onClick={() => { logout(); setMobileMenuOpen(false); }}

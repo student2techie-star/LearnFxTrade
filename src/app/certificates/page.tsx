@@ -1,12 +1,22 @@
 'use client';
 
-import React from 'react';
-import { INITIAL_CERTIFICATES } from '@/lib/mock-data';
+import React, { useState, useEffect } from 'react';
+import { PayoutCertificate } from '@/lib/types';
 import CertificateGrid from '@/components/CertificateGrid';
 import { Award, ShieldCheck, CheckCircle2, TrendingUp, AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
 
 export default function CertificatesPage() {
+  const [certificates, setCertificates] = useState<PayoutCertificate[]>([]);
+
+  useEffect(() => {
+    fetch('/api/certificates')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.certificates) setCertificates(data.certificates);
+      })
+      .catch((err) => console.error('Failed to load certificates:', err));
+  }, []);
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 space-y-12 pb-24">
       {/* Header */}
@@ -44,7 +54,7 @@ export default function CertificatesPage() {
       </div>
 
       {/* Grid of All Certificates */}
-      <CertificateGrid certificates={INITIAL_CERTIFICATES} />
+      <CertificateGrid certificates={certificates} />
 
       {/* Mandatory Disclaimer Box */}
       <div className="rounded-2xl border border-amber-500/20 bg-amber-950/20 p-5 text-xs text-slate-300 space-y-2">

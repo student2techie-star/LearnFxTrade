@@ -1,17 +1,29 @@
 'use client';
 
-import React, { useState } from 'react';
-import { INITIAL_COURSES } from '@/lib/mock-data';
+import React, { useState, useEffect } from 'react';
+import { Course } from '@/lib/types';
 import CourseCard from '@/components/CourseCard';
 import { Search, Filter, BookOpen, Sparkles } from 'lucide-react';
 
 export default function CoursesPage() {
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
 
   const categories = ['All', 'Forex', 'Indian Market', 'Psychology'];
 
-  const filteredCourses = INITIAL_COURSES.filter((course) => {
+  useEffect(() => {
+    fetch('/api/courses')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.courses) setCourses(data.courses);
+      })
+      .catch((err) => console.error('Failed to load courses:', err))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const filteredCourses = courses.filter((course) => {
     const matchesSearch =
       course.title.toLowerCase().includes(search.toLowerCase()) ||
       course.description.toLowerCase().includes(search.toLowerCase());

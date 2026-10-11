@@ -8,6 +8,7 @@ interface AuthContextType {
   isLoading: boolean;
   login: (email: string, role?: 'student' | 'admin') => Promise<void>;
   register: (name: string, email: string, phone?: string) => Promise<void>;
+  updateUser: (data: { name: string; email: string; phone?: string; newPassword?: string }) => Promise<void>;
   logout: () => void;
   isEnrolled: (courseId: string) => boolean;
   refreshEnrollments: () => Promise<void>;
@@ -19,6 +20,7 @@ const AuthContext = createContext<AuthContextType>({
   isLoading: true,
   login: async () => {},
   register: async () => {},
+  updateUser: async () => {},
   logout: () => {},
   isEnrolled: () => false,
   refreshEnrollments: async () => {},
@@ -154,6 +156,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const updateUser = async (data: { name: string; email: string; phone?: string; newPassword?: string }) => {
+    if (!user) throw new Error('No active user session');
+    const res = await fetch('/api/user/profile', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: user.id, ...data }),
+    });
+    if (res.ok) {
+      const result = await res.json();
+      setUser(result.user);
+      safeStorage.setItem('learnfx_user', JSON.stringify(result.user));
+    } else {
+      const err = await res.json();
+      throw new Error(err.error || 'Failed to update profile');
+    }
+  };
+
   const logout = () => {
     setUser(null);
     setEnrolledCourseIds([]);
@@ -172,6 +191,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isLoading,
         login,
         register,
+        updateUser,
         logout,
         isEnrolled,
         refreshEnrollments,
