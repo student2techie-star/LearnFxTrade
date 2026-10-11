@@ -25,35 +25,76 @@ const AuthContext = createContext<AuthContextType>({
   enrolledCourseIds: [],
 });
 
+// Safe storage helper that protects against SecurityError / blocked third-party storage / incognito restrictions
+const safeStorage = {
+  getItem: (key: string): string | null => {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        return window.localStorage.getItem(key);
+      }
+    } catch (e) {
+      // Storage access blocked or restricted by browser
+    }
+    return null;
+  },
+  setItem: (key: string, value: string) => {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        window.localStorage.setItem(key, value);
+      }
+    } catch (e) {
+      // Ignore if quota exceeded or storage blocked
+    }
+  },
+  removeItem: (key: string) => {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        window.localStorage.removeItem(key);
+      }
+    } catch (e) {
+      // Ignore
+    }
+  },
+};
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [enrolledCourseIds, setEnrolledCourseIds] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load user from localStorage on mount
+  // Load user on mount safely
   useEffect(() => {
-    const stored = localStorage.getItem('learnfx_user');
-    if (stored) {
-      try {
+    try {
+      const stored = safeStorage.getItem('learnfx_user');
+      if (stored) {
         const parsed = JSON.parse(stored);
         setUser(parsed);
-      } catch (e) {
-        console.error(e);
+      } else {
+        // Default initial mock logged-in state as student for instant preview capability
+        const defaultUser: User = {
+          id: 'user-demo-student',
+          name: 'Rahul Sharma (Demo)',
+          email: 'student@example.com',
+          phone: '+91 98111 22334',
+          role: 'student',
+          createdAt: new Date().toISOString(),
+        };
+        setUser(defaultUser);
+        safeStorage.setItem('learnfx_user', JSON.stringify(defaultUser));
       }
-    } else {
-      // Default initial mock logged-in state as student for instant preview capability
-      const defaultUser: User = {
+    } catch (e) {
+      // Fallback in-memory
+      setUser({
         id: 'user-demo-student',
         name: 'Rahul Sharma (Demo)',
         email: 'student@example.com',
         phone: '+91 98111 22334',
         role: 'student',
         createdAt: new Date().toISOString(),
-      };
-      setUser(defaultUser);
-      localStorage.setItem('learnfx_user', JSON.stringify(defaultUser));
+      });
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   }, []);
 
   const refreshEnrollments = async () => {
@@ -89,7 +130,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (res.ok) {
       const data = await res.json();
       setUser(data.user);
-      localStorage.setItem('learnfx_user', JSON.stringify(data.user));
+      safeStorage.setItem('learnfx_user', JSON.stringify(data.user));
       await refreshEnrollments();
     } else {
       throw new Error('Login failed');
@@ -105,7 +146,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (res.ok) {
       const data = await res.json();
       setUser(data.user);
-      localStorage.setItem('learnfx_user', JSON.stringify(data.user));
+      safeStorage.setItem('learnfx_user', JSON.stringify(data.user));
       await refreshEnrollments();
     } else {
       const err = await res.json();
@@ -116,7 +157,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = () => {
     setUser(null);
     setEnrolledCourseIds([]);
-    localStorage.removeItem('learnfx_user');
+    safeStorage.removeItem('learnfx_user');
   };
 
   const isEnrolled = (courseId: string) => {
