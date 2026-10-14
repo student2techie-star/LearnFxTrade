@@ -167,17 +167,50 @@ export async function POST(req: Request) {
       ? `${studentName} (${contactParts || 'Enrolled'})`
       : contactParts || 'Anonymous Trader';
 
+    // 1. Supabase Enrollment Persistence
     if (isSupabaseConfigured) {
-      const { data } = await supabase.from('live_sessions').select('enrolled_attendees, total_seats').eq('id', sessionId).maybeSingle();
-      if (data) {
-        const existingAttendees = Array.isArray(data.enrolled_attendees) ? data.enrolled_attendees : [];
-        if (!existingAttendees.includes(attendee)) {
-          const updatedAttendees = [...existingAttendees, attendee];
-          await supabase.from('live_sessions').update({ enrolled_attendees: updatedAttendees }).eq('id', sessionId);
+      const { data: sessionData, error: fetchErr } = await supabase
+        .from('live_sessions')
+        .select('*')
+        .eq('id', sessionId)
+        .maybeSingle();
+
+      if (sessionData) {
+        const existingAttendees: string[] = Array.isArray(sessionData.enrolled_attendees) ? sessionData.enrolled_attendees : [];
+        const totalSeats = Number(sessionData.total_seats) || 100;
+
+        if (existingAttendees.length >= totalSeats) {
+          return NextResponse.json({ error: 'Live session capacity is full!' }, { status: 400 });
         }
+
+        const updatedAttendees = existingAttendees.includes(attendee)
+          ? existingAttendees
+          : [...existingAttendees, attendee];
+
+        const { error: updateErr } = await supabase
+          .from('live_sessions')
+          .update({ enrolled_attendees: updatedAttendees })
+          .eq('id', sessionId);
+
+        if (updateErr) {
+          console.error('Error updating live session enrollment in Supabase:', updateErr);
+        }
+
+        // Also sync into in-memory store if present
+        db.enrollInLiveSession(sessionId, attendee);
+
+        return NextResponse.json({
+          success: true,
+          message: 'Successfully enrolled for live session! Meeting link details will be shared.',
+          session: {
+            ...sessionData,
+            enrolledAttendees: updatedAttendees,
+          },
+        });
       }
     }
 
+    // 2. In-memory fallback
     const result = db.enrollInLiveSession(sessionId, attendee);
     if (!result.success) {
       return NextResponse.json({ error: result.error }, { status: 400 });
