@@ -9,8 +9,8 @@ import { TrendingUp, Lock, Mail, ArrowRight, ShieldCheck } from 'lucide-react';
 export default function LoginPage() {
   const router = useRouter();
   const { login } = useAuth();
-  const [email, setEmail] = useState('student@example.com');
-  const [password, setPassword] = useState('password123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [role, setRole] = useState<'student' | 'admin'>('student');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -20,8 +20,8 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
     try {
-      await login(email, role);
-      if (role === 'admin') {
+      await login(email, password, role);
+      if (role === 'admin' || email.trim().toLowerCase() === 'admin@learnfxtrade.com') {
         router.push('/admin');
       } else {
         router.push('/dashboard');

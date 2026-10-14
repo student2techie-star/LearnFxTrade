@@ -2,6 +2,8 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/lib/auth-context';
 import {
   Upload,
   Plus,
@@ -31,6 +33,8 @@ import {
   Send,
   MessageSquare,
   Copy,
+  LogOut,
+  Lock,
 } from 'lucide-react';
 import { LiveSession } from '@/lib/types';
 
@@ -90,6 +94,8 @@ interface OfflineBatch {
 }
 
 export default function AdminPage() {
+  const router = useRouter();
+  const { user, isLoading: authLoading, logout } = useAuth();
   const [activeTab, setActiveTab] = useState<'dashboard' | 'courses' | 'offline' | 'offline_students' | 'live_sessions' | 'live_students' | 'certificates' | 'students' | 'orders'>('dashboard');
   const [collapsed, setCollapsed] = useState(false);
   const [courses, setCourses] = useState<Course[]>([]);
@@ -100,6 +106,20 @@ export default function AdminPage() {
   const [liveSessions, setLiveSessions] = useState<LiveSession[]>([]);
   const [metrics, setMetrics] = useState({ revenue: 0, studentsCount: 0, coursesCount: 0, certsCount: 0, ordersCount: 0, batchesCount: 0, liveSessionsCount: 0 });
   const [loading, setLoading] = useState(true);
+
+  // Authentication Protection: Require admin login
+  useEffect(() => {
+    if (!authLoading) {
+      if (!user || user.role !== 'admin') {
+        router.push('/login');
+      }
+    }
+  }, [user, authLoading, router]);
+
+  const handleAdminSignOut = () => {
+    logout();
+    router.push('/login');
+  };
 
   // Offline Students Filter States
   const [selectedBatchDateFilter, setSelectedBatchDateFilter] = useState<string>('all');
@@ -564,8 +584,8 @@ export default function AdminPage() {
           })}
         </nav>
 
-        {/* Bottom Link to Website */}
-        <div className="border-t border-[#222222] p-3">
+        {/* Bottom Actions: Website & Sign Out */}
+        <div className="border-t border-[#222222] p-3 space-y-2">
           <Link
             href="/"
             className="flex w-full items-center gap-2 rounded-xl border border-[#222222] bg-[#141416] px-3 py-2 text-xs font-bold text-white hover:bg-[#202024] transition"
@@ -573,6 +593,15 @@ export default function AdminPage() {
             <ExternalLink className="h-4 w-4 text-[#10b981]" />
             {!collapsed && <span>Go to Website</span>}
           </Link>
+
+          <button
+            onClick={handleAdminSignOut}
+            className="flex w-full items-center gap-2 rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs font-bold text-rose-400 hover:bg-rose-500/20 hover:text-rose-300 transition cursor-pointer"
+            title="Sign Out"
+          >
+            <LogOut className="h-4 w-4" />
+            {!collapsed && <span>Sign Out</span>}
+          </button>
         </div>
       </aside>
 
@@ -600,6 +629,13 @@ export default function AdminPage() {
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#222222] bg-[#141416] text-xs font-bold text-[#a1a1aa] hover:text-white transition cursor-pointer"
             >
               <RefreshCw className={`h-3.5 w-3.5 ${loading ? 'animate-spin text-[#10b981]' : ''}`} /> Refresh
+            </button>
+
+            <button
+              onClick={handleAdminSignOut}
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-rose-500/40 bg-rose-500/10 text-xs font-bold text-rose-400 hover:bg-rose-500/20 hover:text-rose-300 transition cursor-pointer shadow-sm"
+            >
+              <LogOut className="h-3.5 w-3.5" /> Sign Out
             </button>
           </div>
         </header>

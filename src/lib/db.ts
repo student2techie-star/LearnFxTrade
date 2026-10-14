@@ -186,9 +186,13 @@ class DataStore {
     return this.users.find(u => u.email.toLowerCase() === email.toLowerCase());
   }
 
-  createUser(name: string, email: string, phone?: string, role: 'student' | 'admin' = 'student'): User {
+  createUser(name: string, email: string, phone?: string, role: 'student' | 'admin' = 'student', password_hash?: string): User {
     const existing = this.getUserByEmail(email);
-    if (existing) return existing;
+    if (existing) {
+      if (password_hash) existing.password_hash = password_hash;
+      if (role) existing.role = role;
+      return existing;
+    }
 
     const newUser: User = {
       id: `user-${Date.now()}`,
@@ -196,6 +200,7 @@ class DataStore {
       email,
       phone,
       role,
+      password_hash,
       createdAt: new Date().toISOString()
     };
     this.users.push(newUser);

@@ -6,7 +6,7 @@ import { User } from './types';
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
-  login: (email: string, role?: 'student' | 'admin') => Promise<void>;
+  login: (email: string, password?: string, role?: 'student' | 'admin') => Promise<void>;
   register: (name: string, email: string, phone?: string) => Promise<void>;
   updateUser: (data: { name: string; email: string; phone?: string; newPassword?: string }) => Promise<void>;
   logout: () => void;
@@ -72,28 +72,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const parsed = JSON.parse(stored);
         setUser(parsed);
       } else {
-        // Default initial mock logged-in state as student for instant preview capability
-        const defaultUser: User = {
-          id: 'user-demo-student',
-          name: 'Rahul Sharma (Demo)',
-          email: 'student@example.com',
-          phone: '+91 98111 22334',
-          role: 'student',
-          createdAt: new Date().toISOString(),
-        };
-        setUser(defaultUser);
-        safeStorage.setItem('learnfx_user', JSON.stringify(defaultUser));
+        setUser(null);
       }
     } catch (e) {
-      // Fallback in-memory
-      setUser({
-        id: 'user-demo-student',
-        name: 'Rahul Sharma (Demo)',
-        email: 'student@example.com',
-        phone: '+91 98111 22334',
-        role: 'student',
-        createdAt: new Date().toISOString(),
-      });
+      setUser(null);
     } finally {
       setIsLoading(false);
     }
@@ -123,11 +105,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [user]);
 
-  const login = async (email: string, role: 'student' | 'admin' = 'student') => {
+  const login = async (email: string, password?: string, role: 'student' | 'admin' = 'student') => {
     const res = await fetch('/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, role }),
+      body: JSON.stringify({ email, password, role }),
     });
     if (res.ok) {
       const data = await res.json();
@@ -135,7 +117,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       safeStorage.setItem('learnfx_user', JSON.stringify(data.user));
       await refreshEnrollments();
     } else {
-      throw new Error('Login failed');
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Login failed');
     }
   };
 

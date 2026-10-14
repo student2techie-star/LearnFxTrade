@@ -43,8 +43,13 @@ CREATE TABLE IF NOT EXISTS public.users (
   email TEXT UNIQUE NOT NULL,
   phone TEXT,
   role TEXT DEFAULT 'student',
+  password_hash TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Quick migration if table already exists
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS password_hash TEXT;
+
 
 -- 4. Enrollments Table (Access Control)
 CREATE TABLE IF NOT EXISTS public.enrollments (
