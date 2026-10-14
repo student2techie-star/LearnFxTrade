@@ -35,6 +35,8 @@ import {
   Copy,
   LogOut,
   Lock,
+  Edit,
+  X,
 } from 'lucide-react';
 import { LiveSession } from '@/lib/types';
 
@@ -133,7 +135,8 @@ export default function AdminPage() {
   const [broadcastModalSession, setBroadcastModalSession] = useState<LiveSession | null>(null);
   const [customMeetingLink, setCustomMeetingLink] = useState<string>('');
 
-  // Live Session Form State
+  // Live Session Form & Edit State
+  const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
   const [liveSessionForm, setLiveSessionForm] = useState({
     title: '',
     topic: '',
@@ -437,17 +440,20 @@ export default function AdminPage() {
     }
 
     try {
+      const isEditing = Boolean(editingSessionId);
       const res = await fetch('/api/live-sessions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          action: 'create',
+          action: isEditing ? 'update' : 'create',
+          sessionId: editingSessionId,
           ...liveSessionForm,
           scheduledDate: finalScheduledDate,
         }),
       });
       if (res.ok) {
-        alert('Live Session scheduled successfully!');
+        alert(isEditing ? 'Live Session updated successfully!' : 'Live Session scheduled successfully!');
+        setEditingSessionId(null);
         setLiveSessionForm({
           title: '',
           topic: '',
@@ -467,11 +473,34 @@ export default function AdminPage() {
         fetchData();
       } else {
         const d = await res.json();
-        alert(d.error || 'Failed to schedule live session');
+        alert(d.error || 'Failed to save live session');
       }
     } catch {
-      alert('Error scheduling live session');
+      alert('Error saving live session');
     }
+  };
+
+  // Populate form for editing existing session
+  const handleEditLiveSession = (session: LiveSession) => {
+    setEditingSessionId(session.id);
+    setLiveSessionForm({
+      title: session.title,
+      topic: session.topic || '',
+      category: (session.category as any) || 'Forex SMC',
+      scheduledDate: session.scheduledDate || '',
+      dateInput: '',
+      timeInput: '',
+      duration: session.duration || '90 Mins',
+      priceInr: session.priceInr || 0,
+      advanceFeeInr: session.advanceFeeInr || 0,
+      hostMentor: session.hostMentor || 'Somnath (Lead Trader)',
+      platform: (session.platform as any) || 'Zoom',
+      meetingUrl: session.meetingUrl || '',
+      totalSeats: session.totalSeats || 100,
+      description: session.description || '',
+    });
+    // Scroll smoothly to form
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // Delete Live Session
@@ -1661,11 +1690,43 @@ export default function AdminPage() {
 
               {/* Schedule New Live Session Form */}
               <div className="rounded-2xl border border-[#222222] bg-[#0c0c0e] p-6 space-y-4 shadow-xl">
-                <div className="flex items-center gap-2">
-                  <div className="h-7 w-7 rounded-lg bg-[#10b981]/20 text-[#10b981] flex items-center justify-center font-bold">
-                    <Plus className="h-4 w-4" />
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="h-7 w-7 rounded-lg bg-[#10b981]/20 text-[#10b981] flex items-center justify-center font-bold">
+                      {editingSessionId ? <Edit className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+                    </div>
+                    <h3 className="text-base font-bold text-white">
+                      {editingSessionId ? 'Edit Live Session Details' : 'Schedule New Live Session'}
+                    </h3>
                   </div>
-                  <h3 className="text-base font-bold text-white">Schedule New Live Session</h3>
+
+                  {editingSessionId && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditingSessionId(null);
+                        setLiveSessionForm({
+                          title: '',
+                          topic: '',
+                          category: 'Forex SMC',
+                          scheduledDate: '',
+                          dateInput: '',
+                          timeInput: '',
+                          duration: '90 Mins',
+                          priceInr: 1499,
+                          advanceFeeInr: 399,
+                          hostMentor: 'Somnath (Lead Trader)',
+                          platform: 'Zoom',
+                          meetingUrl: 'https://zoom.us/j/',
+                          totalSeats: 100,
+                          description: '',
+                        });
+                      }}
+                      className="text-xs text-rose-400 hover:text-rose-300 font-bold flex items-center gap-1 cursor-pointer"
+                    >
+                      <X className="h-3.5 w-3.5" /> Cancel Edit
+                    </button>
+                  )}
                 </div>
 
                 <form onSubmit={handleCreateLiveSession} className="space-y-4">
@@ -1820,7 +1881,8 @@ export default function AdminPage() {
                       type="submit"
                       className="px-5 py-2.5 rounded-xl bg-[#10b981] hover:bg-[#059669] text-black font-extrabold text-xs transition cursor-pointer flex items-center gap-2 shadow-md shadow-[#10b981]/20"
                     >
-                      <Plus className="h-4 w-4" /> Publish Live Session
+                      {editingSessionId ? <Edit className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+                      <span>{editingSessionId ? 'Save & Update Live Session' : 'Publish Live Session'}</span>
                     </button>
                   </div>
                 </form>
@@ -1873,20 +1935,28 @@ export default function AdminPage() {
                               ) : null}
                             </div>
                           </div>
-                          <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => handleEditLiveSession(session)}
+                              className="text-[#a1a1aa] hover:text-[#10b981] transition p-1.5 rounded-lg hover:bg-[#18181b] cursor-pointer flex items-center gap-1 text-[11px] font-bold"
+                              title="Edit Session"
+                            >
+                              <Edit className="h-3.5 w-3.5" />
+                              <span>Edit</span>
+                            </button>
                             <button
                               onClick={() => handleDeleteLiveSession(session.id)}
-                              className="text-[#a1a1aa] hover:text-rose-400 transition p-1 rounded cursor-pointer"
+                              className="text-[#a1a1aa] hover:text-rose-400 transition p-1.5 rounded-lg hover:bg-[#18181b] cursor-pointer"
                               title="Delete Session"
                             >
-                              <Trash2 className="h-4 w-4" />
+                              <Trash2 className="h-3.5 w-3.5" />
                             </button>
                             <button
                               onClick={() => {
                                 setSelectedLiveSessionFilter(session.id);
                                 setActiveTab('live_students');
                               }}
-                              className="text-[#10b981] hover:underline font-bold text-xs flex items-center gap-1 cursor-pointer"
+                              className="text-[#10b981] hover:underline font-bold text-xs flex items-center gap-1 cursor-pointer ml-1"
                             >
                               <span>Inspect ({attendees.length})</span>
                               <span>→</span>

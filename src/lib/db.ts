@@ -10,71 +10,7 @@ class DataStore {
   private orders: Order[] = [];
   private progress: LessonProgress[] = [];
   private offlineBatches: OfflineBatch[] = [];
-  private liveSessions: LiveSession[] = [
-    {
-      id: 'live-london-smc',
-      title: 'London Open Live SMC Execution & Order Flow Breakdown',
-      topic: 'Live London session killzone analysis, liquidity pool run execution on EUR/USD & GBP/JPY with real-time entry triggers.',
-      category: 'Forex SMC',
-      scheduledDate: 'Tomorrow at 1:00 PM IST',
-      duration: '90 Mins',
-      priceInr: 1999,
-      advanceFeeInr: 499,
-      hostMentor: 'Somnath (Lead Trader)',
-      platform: 'Zoom',
-      meetingUrl: 'https://zoom.us/j/98234710293',
-      totalSeats: 50,
-      enrolledAttendees: [
-        'Arun Kumar (arun.fx@gmail.com | +91 98840 12345)',
-        'Pooja Venkatesh (pooja.trade@gmail.com | +91 97910 88765)',
-        'Karthik R (karthik.smc@yahoo.com | +91 94441 55678)',
-        'Vignesh K (vignesh.k@gmail.com | +91 99620 44321)'
-      ],
-      status: 'upcoming',
-      description: 'Live interactive screen share during the London open. Ask doubts directly, review charts together, and observe real-time order block validation.',
-    },
-    {
-      id: 'live-nifty-expiry',
-      title: 'Nifty & BankNifty Live Expiry Day Strategy Lab',
-      topic: 'Zero-to-Hero risk-controlled option buying setups, Open Interest trap identification, and CPR breakout timing.',
-      category: 'Indian Market',
-      scheduledDate: 'Thursday at 9:00 AM IST',
-      duration: '120 Mins',
-      priceInr: 1499,
-      advanceFeeInr: 399,
-      hostMentor: 'Somnath (Lead Trader)',
-      platform: 'Google Meet',
-      meetingUrl: 'https://meet.google.com/nif-tyex-pir',
-      totalSeats: 40,
-      enrolledAttendees: [
-        'Sanjay Narayanan (sanjay.n@gmail.com | +91 98401 77654)',
-        'Divya Balaji (divya.b@outlook.com | +91 99402 33445)',
-        'Rahul S (rahul.trader@gmail.com | +91 97890 11223)'
-      ],
-      status: 'upcoming',
-      description: 'Live market execution during Indian market trading hours. Master theta management and high-momentum gamma bursts.',
-    },
-    {
-      id: 'live-propfirm-qa',
-      title: 'Prop Firm Evaluation AMA: Passing FTMO & Drawdown Rules',
-      topic: '1-on-1 portfolio desk review, psychology management under 5% daily drawdown, and payout extraction strategies.',
-      category: 'Psychology & Q&A',
-      scheduledDate: 'Saturday at 6:30 PM IST',
-      duration: '75 Mins',
-      priceInr: 999,
-      advanceFeeInr: 299,
-      hostMentor: 'Somnath (Lead Trader)',
-      platform: 'Zoom',
-      meetingUrl: 'https://zoom.us/j/84712093412',
-      totalSeats: 60,
-      enrolledAttendees: [
-        'Harish V (harish.funded@gmail.com | +91 98412 66789)',
-        'Meena Rajan (meena.rajan@gmail.com | +91 97103 44556)'
-      ],
-      status: 'upcoming',
-      description: 'Interactive open floor Q&A session. Bring your recent trading journal for live trade critique and feedback.',
-    },
-  ];
+  private liveSessions: LiveSession[] = [];
 
 
   // Courses
@@ -352,6 +288,13 @@ class DataStore {
     const initialLen = this.liveSessions.length;
     this.liveSessions = this.liveSessions.filter(s => s.id !== id);
     return this.liveSessions.length < initialLen;
+  }
+
+  updateLiveSession(id: string, updates: Partial<LiveSession>): LiveSession | null {
+    const idx = this.liveSessions.findIndex(s => s.id === id);
+    if (idx === -1) return null;
+    this.liveSessions[idx] = { ...this.liveSessions[idx], ...updates };
+    return this.liveSessions[idx];
   }
 
   enrollInLiveSession(sessionId: string, attendeeInfo: string): { success: boolean; session?: LiveSession; error?: string } {
