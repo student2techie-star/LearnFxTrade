@@ -49,27 +49,26 @@ export async function POST(req: Request) {
     const isTargetingAdmin = role === 'admin' || (dbUser && dbUser.role === 'admin');
 
     if (isTargetingAdmin) {
-      // Must exist in Database with role === 'admin'
+      // 1. Check if user exists in Database with role === 'admin'
       if (!dbUser || dbUser.role !== 'admin') {
         return NextResponse.json(
-          { error: 'Admin account does not exist in the database with admin privileges.' },
+          { error: 'No administrator account found with this email in the database.' },
           { status: 403 }
         );
       }
 
-      // Password verification from database
+      // 2. Password verification from database
       const storedPassword = dbUser.password_hash || dbUser.password;
       const isValidPassword =
         storedPassword &&
         (storedPassword === inputHash || storedPassword === password || storedPassword === password.trim());
 
-      // If no password column exists in Supabase yet, allow initial bootstrap password from database sync
       const fallbackEnvPassword = process.env.ADMIN_PASSWORD;
       const isEnvMatch = fallbackEnvPassword && (password === fallbackEnvPassword || inputHash === hashPassword(fallbackEnvPassword));
 
       if (!isValidPassword && !isEnvMatch) {
         return NextResponse.json(
-          { error: 'Invalid admin credentials. Please enter the correct password from your database.' },
+          { error: 'Incorrect admin password. Please check your password and try again.' },
           { status: 401 }
         );
       }
