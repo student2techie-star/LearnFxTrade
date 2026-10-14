@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 
 export async function GET() {
   const users = db.getUsers();
@@ -49,26 +50,54 @@ export async function GET() {
   });
 }
 
-
 export async function POST(req: Request) {
   try {
-    const { action, userId, courseId } = await req.json();
+    const body = await req.json();
+    const { action, userId, courseId, certId, lessonId, batchId } = body;
 
     if (action === 'grant_access') {
+      if (isSupabaseConfigured) {
+        await supabase.from('enrollments').upsert({
+          id: `enr-${Date.now()}`,
+          user_id: userId,
+          course_id: courseId,
+          granted_at: new Date().toISOString(),
+        });
+      }
       const enr = db.grantEnrollment(userId, courseId);
       return NextResponse.json({ success: true, enrollment: enr });
     } else if (action === 'revoke_access') {
+      if (isSupabaseConfigured) {
+        await supabase.from('enrollments').delete().match({ user_id: userId, course_id: courseId });
+      }
       const res = db.revokeEnrollment(userId, courseId);
       return NextResponse.json({ success: true, revoked: res });
     } else if (action === 'delete_course') {
+      if (isSupabaseConfigured) {
+        await supabase.from('courses').delete().eq('id', courseId);
+      }
       const res = db.deleteCourse(courseId);
       return NextResponse.json({ success: res });
     } else if (action === 'delete_certificate') {
-      const { certId } = await req.clone().json();
+      if (isSupabaseConfigured) {
+        await supabase.from('certificates').delete().eq('id', certId);
+      }
       const res = db.deleteCertificate(certId);
       return NextResponse.json({ success: res });
     } else if (action === 'add_lesson') {
-      const body = await req.clone().json();
+      const lessonId = `les-${Date.now()}`;
+      if (isSupabaseConfigured) {
+        await supabase.from('lessons').insert({
+          id: lessonId,
+          course_id: body.courseId,
+          title: body.title,
+          video_id: body.videoId,
+          duration: body.duration || '15:00',
+          order_no: Number(body.orderNo) || 1,
+          is_free_preview: Boolean(body.isFreePreview),
+          description: body.description || '',
+        });
+      }
       const newLesson = db.createLesson({
         courseId: body.courseId,
         title: body.title,
@@ -80,20 +109,45 @@ export async function POST(req: Request) {
       });
       return NextResponse.json({ success: true, lesson: newLesson });
     } else if (action === 'delete_lesson') {
-      const body = await req.clone().json();
-      const res = db.deleteLesson(body.lessonId);
+      if (isSupabaseConfigured) {
+        await supabase.from('lessons').delete().eq('id', lessonId);
+      }
+      const res = db.deleteLesson(lessonId);
       return NextResponse.json({ success: res });
     } else if (action === 'create_offline_batch') {
-      const body = await req.clone().json();
+      const newBatchId = `batch-${Date.now()}`;
+      const priceInr = Number(body.priceInr) || 14999;
+      const advanceFeeInr = Number(body.advanceFeeInr) || 2999;
+      const totalSeats = Number(body.totalSeats) || 25;
+
+      if (isSupabaseConfigured) {
+        await supabase.from('offline_batches').insert({
+          id: newBatchId,
+          title: body.title,
+          city: body.city || 'Chennai',
+          venue: body.venue || 'ITC Grand Chola / Guindy Tech Trading Hub, Chennai',
+          start_date: body.startDate || 'Upcoming',
+          end_date: body.endDate || 'Upcoming',
+          timing: body.timing || '9:30 AM - 5:30 PM',
+          price_inr: priceInr,
+          total_seats: totalSeats,
+          booked_seats: 0,
+          status: 'upcoming',
+          notes: body.notes || '',
+          enrolled_students: [],
+        });
+      }
+
       const newBatch = db.createOfflineBatch({
         title: body.title,
-        city: body.city || 'Bengaluru',
-        venue: body.venue || 'City Trading Center',
+        city: body.city || 'Chennai',
+        venue: body.venue || 'ITC Grand Chola / Guindy Tech Trading Hub, Chennai',
         startDate: body.startDate || 'Upcoming',
         endDate: body.endDate || 'Upcoming',
         timing: body.timing || '9:30 AM - 5:30 PM',
-        priceInr: Number(body.priceInr) || 14999,
-        totalSeats: Number(body.totalSeats) || 25,
+        priceInr,
+        advanceFeeInr,
+        totalSeats,
         bookedSeats: 0,
         status: 'upcoming',
         notes: body.notes || '',
@@ -101,13 +155,14 @@ export async function POST(req: Request) {
       });
       return NextResponse.json({ success: true, batch: newBatch });
     } else if (action === 'delete_offline_batch') {
-      const body = await req.clone().json();
-      const res = db.deleteOfflineBatch(body.batchId);
+      if (isSupabaseConfigured) {
+        await supabase.from('offline_batches').delete().eq('id', batchId);
+      }
+      const res = db.deleteOfflineBatch(batchId);
       return NextResponse.json({ success: res });
     }
 
     return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
-
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : 'Admin action failed';
     return NextResponse.json({ error: msg }, { status: 500 });
