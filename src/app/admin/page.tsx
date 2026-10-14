@@ -111,14 +111,14 @@ export default function AdminPage() {
   useEffect(() => {
     if (!authLoading) {
       if (!user || user.role !== 'admin') {
-        router.push('/login');
+        router.push('/admin/login');
       }
     }
   }, [user, authLoading, router]);
 
   const handleAdminSignOut = () => {
     logout();
-    router.push('/login');
+    router.push('/admin/login');
   };
 
   // Offline Students Filter States

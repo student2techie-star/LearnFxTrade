@@ -46,45 +46,6 @@ export default function LoginPage() {
           </p>
         </div>
 
-        {/* Quick Demo Switcher */}
-        <div className="p-3 rounded-2xl bg-slate-950 border border-slate-800 text-xs space-y-2">
-          <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
-            <span>Instant Demo Logins:</span>
-            <span className="text-emerald-400">1-Click Pick</span>
-          </div>
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              onClick={() => {
-                setEmail('student@example.com');
-                setRole('student');
-              }}
-              className={`p-2 rounded-xl text-left border transition ${
-                role === 'student'
-                  ? 'border-emerald-500/50 bg-emerald-500/10 text-white'
-                  : 'border-slate-800 bg-slate-900 text-slate-400'
-              }`}
-            >
-              <div className="font-bold text-[11px]">Enrolled Student</div>
-              <div className="text-[10px] text-slate-400 truncate">student@example.com</div>
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setEmail('admin@learnfxtrade.com');
-                setRole('admin');
-              }}
-              className={`p-2 rounded-xl text-left border transition ${
-                role === 'admin'
-                  ? 'border-amber-500/50 bg-amber-500/10 text-white'
-                  : 'border-slate-800 bg-slate-900 text-slate-400'
-              }`}
-            >
-              <div className="font-bold text-[11px] text-amber-400">Admin Mentor</div>
-              <div className="text-[10px] text-slate-400 truncate">admin@learnfxtrade.com</div>
-            </button>
-          </div>
-        </div>
 
         {error && (
           <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs">
