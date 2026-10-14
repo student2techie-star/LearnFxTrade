@@ -3,6 +3,178 @@ import { db } from '@/lib/db';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 
 export async function GET() {
+  try {
+    if (isSupabaseConfigured) {
+      const [
+        usersRes,
+        coursesRes,
+        certsRes,
+        batchesRes,
+        liveRes,
+        enrollmentsRes,
+        ordersRes,
+        lessonsRes
+      ] = await Promise.all([
+        supabase.from('users').select('*').order('created_at', { ascending: false }),
+        supabase.from('courses').select('*').order('created_at', { ascending: false }),
+        supabase.from('certificates').select('*').order('order_no', { ascending: true }),
+        supabase.from('offline_batches').select('*').order('created_at', { ascending: false }),
+        supabase.from('live_sessions').select('*').order('created_at', { ascending: false }),
+        supabase.from('enrollments').select('*').order('granted_at', { ascending: false }),
+        supabase.from('orders').select('*').order('created_at', { ascending: false }),
+        supabase.from('lessons').select('*').order('order_no', { ascending: true }),
+      ]);
+
+      const dbUsers = usersRes.data || [];
+      const dbCourses = (coursesRes.data || []).map((row: any) => ({
+        id: row.id,
+        title: row.title,
+        slug: row.slug,
+        tagline: row.tagline || '',
+        description: row.description || '',
+        priceInr: Number(row.price_inr) || 0,
+        originalPriceInr: Number(row.original_price_inr) || 0,
+        thumbnailUrl: row.thumbnail_url || '',
+        category: row.category || 'Forex',
+        level: row.level || 'Intermediate',
+        isPublished: row.is_published ?? true,
+        features: Array.isArray(row.features) ? row.features : [],
+        lessonsCount: Number(row.lessons_count) || 0,
+        totalDuration: row.total_duration || '0h',
+        createdAt: row.created_at,
+      }));
+
+      const dbCerts = (certsRes.data || []).map((row: any) => ({
+        id: row.id,
+        title: row.title,
+        firmOrBroker: row.firm_or_broker,
+        amount: row.amount,
+        date: row.date || '',
+        imageUrl: row.image_url,
+        accountType: row.account_type || 'Prop Firm Funded',
+        verifiedRef: row.verified_ref || '',
+        orderNo: Number(row.order_no) || 1,
+        isVisible: row.is_visible ?? true,
+      }));
+
+      const dbBatches = (batchesRes.data || []).map((row: any) => ({
+        id: row.id,
+        title: row.title,
+        city: row.city || 'Chennai',
+        venue: row.venue,
+        startDate: row.start_date,
+        endDate: row.end_date,
+        timing: row.timing || '9:30 AM - 5:30 PM IST',
+        priceInr: Number(row.price_inr) || 14999,
+        advanceFeeInr: Number(row.advance_fee_inr) || 2999,
+        totalSeats: Number(row.total_seats) || 25,
+        bookedSeats: Number(row.booked_seats) || 0,
+        status: row.status || 'upcoming',
+        notes: row.notes || '',
+        enrolledStudents: Array.isArray(row.enrolled_students) ? row.enrolled_students : [],
+      }));
+
+      const dbLiveSessions = (liveRes.data || []).map((row: any) => ({
+        id: row.id,
+        title: row.title,
+        topic: row.topic || '',
+        category: row.category || 'Forex SMC',
+        scheduledDate: row.scheduled_date || '',
+        duration: row.duration || '90 Mins',
+        priceInr: Number(row.price_inr) || 0,
+        advanceFeeInr: Number(row.advance_fee_inr) || 0,
+        hostMentor: row.host_mentor || 'Somnath (Lead Trader)',
+        platform: row.platform || 'Zoom',
+        meetingUrl: row.meeting_url || '',
+        totalSeats: Number(row.total_seats) || 100,
+        enrolledAttendees: Array.isArray(row.enrolled_attendees) ? row.enrolled_attendees : [],
+        status: row.status || 'upcoming',
+        description: row.description || '',
+      }));
+
+      const dbEnrollments = (enrollmentsRes.data || []).map((row: any) => ({
+        id: row.id,
+        userId: row.user_id,
+        courseId: row.course_id,
+        orderId: row.order_id,
+        grantedAt: row.granted_at,
+      }));
+
+      const dbOrders = (ordersRes.data || []).map((row: any) => ({
+        id: row.id,
+        userId: row.user_id,
+        userEmail: row.user_email,
+        courseId: row.course_id,
+        courseTitle: row.course_title,
+        razorpayOrderId: row.razorpay_order_id,
+        amount: Number(row.amount) || 0,
+        currency: row.currency || 'INR',
+        status: row.status || 'created',
+        createdAt: row.created_at,
+      }));
+
+      const dbLessons = (lessonsRes.data || []).map((row: any) => ({
+        id: row.id,
+        courseId: row.course_id,
+        title: row.title,
+        videoId: row.video_id,
+        duration: row.duration || '15:00',
+        orderNo: Number(row.order_no) || 1,
+        isFreePreview: Boolean(row.is_free_preview),
+        description: row.description || '',
+      }));
+
+      const totalRevenue = dbOrders
+        .filter((o: any) => o.status === 'paid')
+        .reduce((sum: number, o: any) => sum + o.amount, 0);
+
+      const studentsList = dbUsers
+        .filter((u: any) => u.role !== 'admin')
+        .map((user: any) => {
+          const userEnrollments = dbEnrollments.filter((e: any) => e.userId === user.id);
+          const userOrders = dbOrders.filter((o: any) => o.userId === user.id || o.userEmail === user.email);
+          return {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            phone: user.phone,
+            role: user.role,
+            createdAt: user.created_at,
+            enrollmentsCount: userEnrollments.length,
+            enrolledCourses: userEnrollments.map((e: any) => {
+              const c = dbCourses.find((course: any) => course.id === e.courseId);
+              return { courseId: e.courseId, title: c?.title || e.courseId };
+            }),
+            ordersCount: userOrders.length,
+          };
+        });
+
+      return NextResponse.json({
+        metrics: {
+          totalStudents: studentsList.length,
+          totalOrders: dbOrders.length,
+          paidOrders: dbOrders.filter((o: any) => o.status === 'paid').length,
+          totalRevenue,
+          coursesCount: dbCourses.length,
+          certificatesCount: dbCerts.length,
+          lessonsCount: dbLessons.length,
+          offlineBatchesCount: dbBatches.length,
+          liveSessionsCount: dbLiveSessions.length,
+        },
+        students: studentsList,
+        orders: dbOrders,
+        courses: dbCourses,
+        lessons: dbLessons,
+        certificates: dbCerts,
+        offlineBatches: dbBatches,
+        liveSessions: dbLiveSessions,
+      });
+    }
+  } catch (err) {
+    console.warn('Supabase admin/manage query error:', err);
+  }
+
+  // Fallback to in-memory store
   const users = db.getUsers();
   const enrollments = db.getAllEnrollments();
   const orders = db.getOrders();
@@ -12,25 +184,27 @@ export async function GET() {
     .filter(o => o.status === 'paid')
     .reduce((sum, o) => sum + o.amount, 0);
 
-  const studentsList = users.map(user => {
-    const userEnrollments = enrollments.filter(e => e.userId === user.id);
-    const userOrders = orders.filter(o => o.userId === user.id);
-    return {
-      ...user,
-      enrollmentsCount: userEnrollments.length,
-      enrolledCourses: userEnrollments.map(e => {
-        const c = courses.find(course => course.id === e.courseId);
-        return { courseId: e.courseId, title: c?.title || e.courseId };
-      }),
-      ordersCount: userOrders.length,
-    };
-  });
+  const studentsList = users
+    .filter(u => u.role !== 'admin')
+    .map(user => {
+      const userEnrollments = enrollments.filter(e => e.userId === user.id);
+      const userOrders = orders.filter(o => o.userId === user.id);
+      return {
+        ...user,
+        enrollmentsCount: userEnrollments.length,
+        enrolledCourses: userEnrollments.map(e => {
+          const c = courses.find(course => course.id === e.courseId);
+          return { courseId: e.courseId, title: c?.title || e.courseId };
+        }),
+        ordersCount: userOrders.length,
+      };
+    });
 
   const lessons = courses.flatMap(c => db.getLessonsByCourseId(c.id));
 
   return NextResponse.json({
     metrics: {
-      totalStudents: users.filter(u => u.role === 'student').length,
+      totalStudents: studentsList.length,
       totalOrders: orders.length,
       paidOrders: orders.filter(o => o.status === 'paid').length,
       totalRevenue,

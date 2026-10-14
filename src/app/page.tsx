@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { db } from '@/lib/db';
 import CourseCard from '@/components/CourseCard';
 import CertificateGrid from '@/components/CertificateGrid';
 import BearBullMorph from '@/components/BearBullMorph';
+import { Course, PayoutCertificate } from '@/lib/types';
 import {
   ArrowRight,
   TrendingUp,
@@ -21,8 +21,20 @@ import {
 } from 'lucide-react';
 
 export default function HomePage() {
-  const courses = db.getCourses();
-  const certificates = db.getCertificates();
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [certificates, setCertificates] = useState<PayoutCertificate[]>([]);
+
+  useEffect(() => {
+    fetch('/api/courses')
+      .then(res => res.json())
+      .then(data => setCourses(data.courses || []))
+      .catch(err => console.error('Failed to load courses from DB:', err));
+
+    fetch('/api/certificates')
+      .then(res => res.json())
+      .then(data => setCertificates(data.certificates || []))
+      .catch(err => console.error('Failed to load certificates from DB:', err));
+  }, []);
 
   return (
     <div className="min-h-screen bg-black text-white pb-24 space-y-12">
