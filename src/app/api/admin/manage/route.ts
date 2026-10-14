@@ -1,6 +1,11 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
+import crypto from 'crypto';
+
+function hashPassword(password: string): string {
+  return crypto.createHash('sha256').update(password.trim()).digest('hex');
+}
 
 export async function GET() {
   try {
@@ -128,6 +133,17 @@ export async function GET() {
         .filter((o: any) => o.status === 'paid')
         .reduce((sum: number, o: any) => sum + o.amount, 0);
 
+      const adminsList = dbUsers
+        .filter((u: any) => u.role === 'admin')
+        .map((u: any) => ({
+          id: u.id,
+          name: u.name || 'Admin',
+          email: u.email,
+          phone: u.phone || '',
+          role: u.role,
+          createdAt: u.created_at,
+        }));
+
       const studentsList = dbUsers
         .filter((u: any) => u.role !== 'admin')
         .map((user: any) => {
@@ -160,7 +176,9 @@ export async function GET() {
           lessonsCount: dbLessons.length,
           offlineBatchesCount: dbBatches.length,
           liveSessionsCount: dbLiveSessions.length,
+          adminsCount: adminsList.length,
         },
+        admins: adminsList,
         students: studentsList,
         orders: dbOrders,
         courses: dbCourses,
@@ -183,6 +201,17 @@ export async function GET() {
   const totalRevenue = orders
     .filter(o => o.status === 'paid')
     .reduce((sum, o) => sum + o.amount, 0);
+
+  const adminsList = users
+    .filter(u => u.role === 'admin')
+    .map(u => ({
+      id: u.id,
+      name: u.name || 'Admin',
+      email: u.email,
+      phone: u.phone || '',
+      role: u.role,
+      createdAt: u.createdAt,
+    }));
 
   const studentsList = users
     .filter(u => u.role !== 'admin')
@@ -213,7 +242,9 @@ export async function GET() {
       lessonsCount: lessons.length,
       offlineBatchesCount: db.getOfflineBatches().length,
       liveSessionsCount: db.getLiveSessions().length,
+      adminsCount: adminsList.length,
     },
+    admins: adminsList,
     students: studentsList,
     orders,
     courses,
@@ -334,6 +365,90 @@ export async function POST(req: Request) {
       }
       const res = db.deleteOfflineBatch(batchId);
       return NextResponse.json({ success: res });
+    } else if (action === 'create_admin') {
+      const { name, email, phone, password } = body;
+      if (!name || !email || !password) {
+        return NextResponse.json({ error: 'Name, email and password are required' }, { status: 400 });
+      }
+
+      const trimmedEmail = String(email).trim().toLowerCase();
+      const pHash = hashPassword(password);
+      const newAdminId = `adm-${Date.now()}`;
+
+      if (isSupabaseConfigured) {
+        // Upsert into Supabase users table with role 'admin' and password_hash
+        const { error: sbErr } = await supabase.from('users').upsert(
+          {
+            id: newAdminId,
+            name: String(name).trim(),
+            email: trimmedEmail,
+            phone: phone ? String(phone).trim() : null,
+            role: 'admin',
+            password_hash: pHash,
+            created_at: new Date().toISOString(),
+          },
+          { onConflict: 'email' }
+        );
+
+        if (sbErr) {
+          console.error('Supabase admin creation error:', sbErr);
+          return NextResponse.json({ error: sbErr.message }, { status: 500 });
+        }
+      }
+
+      // Also persist to in-memory store
+      const memoryAdmin = db.createUser(
+        String(name).trim(),
+        trimmedEmail,
+        phone ? String(phone).trim() : undefined,
+        'admin',
+        pHash
+      );
+
+      return NextResponse.json({ success: true, admin: memoryAdmin });
+    } else if (action === 'delete_admin') {
+      const { adminId } = body;
+      if (!adminId) {
+        return NextResponse.json({ error: 'Admin ID is required' }, { status: 400 });
+      }
+
+      if (isSupabaseConfigured) {
+        const { error: sbErr } = await supabase
+          .from('users')
+          .delete()
+          .eq('id', adminId);
+
+        if (sbErr) {
+          console.error('Supabase admin delete error:', sbErr);
+          return NextResponse.json({ error: sbErr.message }, { status: 500 });
+        }
+      }
+
+      db.deleteUser(adminId);
+      return NextResponse.json({ success: true });
+    } else if (action === 'change_admin_password') {
+      const { email, newPassword } = body;
+      if (!email || !newPassword) {
+        return NextResponse.json({ error: 'Email and new password are required' }, { status: 400 });
+      }
+
+      const trimmedEmail = String(email).trim().toLowerCase();
+      const pHash = hashPassword(newPassword);
+
+      if (isSupabaseConfigured) {
+        const { error: sbErr } = await supabase
+          .from('users')
+          .update({ password_hash: pHash })
+          .ilike('email', trimmedEmail);
+
+        if (sbErr) {
+          console.error('Supabase change password error:', sbErr);
+          return NextResponse.json({ error: sbErr.message }, { status: 500 });
+        }
+      }
+
+      db.updateUserPassword(trimmedEmail, pHash);
+      return NextResponse.json({ success: true });
     }
 
     return NextResponse.json({ error: 'Invalid action' }, { status: 400 });

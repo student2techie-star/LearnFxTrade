@@ -143,6 +143,19 @@ class DataStore {
     return newUser;
   }
 
+  updateUserPassword(email: string, password_hash: string): boolean {
+    const user = this.getUserByEmail(email);
+    if (!user) return false;
+    user.password_hash = password_hash;
+    return true;
+  }
+
+  deleteUser(userId: string): boolean {
+    const initialLen = this.users.length;
+    this.users = this.users.filter(u => u.id !== userId);
+    return this.users.length < initialLen;
+  }
+
   // Enrollments
   isUserEnrolled(userId: string, courseId: string): boolean {
     return this.enrollments.some(e => e.userId === userId && e.courseId === courseId);

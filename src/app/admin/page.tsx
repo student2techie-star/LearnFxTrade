@@ -37,6 +37,10 @@ import {
   Lock,
   Edit,
   X,
+  UserPlus,
+  Key,
+  Settings,
+  UserCheck2,
 } from 'lucide-react';
 import { LiveSession } from '@/lib/types';
 
@@ -95,19 +99,44 @@ interface OfflineBatch {
   enrolledStudents?: string[];
 }
 
+interface AdminUser {
+  id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  role: string;
+  createdAt?: string;
+}
+
 export default function AdminPage() {
   const router = useRouter();
   const { user, isLoading: authLoading, logout } = useAuth();
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'courses' | 'offline' | 'offline_students' | 'live_sessions' | 'live_students' | 'certificates' | 'students' | 'orders'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'courses' | 'offline' | 'offline_students' | 'live_sessions' | 'live_students' | 'certificates' | 'students' | 'orders' | 'admins' | 'settings'>('dashboard');
   const [collapsed, setCollapsed] = useState(false);
   const [courses, setCourses] = useState<Course[]>([]);
   const [certificates, setCertificates] = useState<Certificate[]>([]);
   const [students, setStudents] = useState<Student[]>([]);
+  const [admins, setAdmins] = useState<AdminUser[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [offlineBatches, setOfflineBatches] = useState<OfflineBatch[]>([]);
   const [liveSessions, setLiveSessions] = useState<LiveSession[]>([]);
-  const [metrics, setMetrics] = useState({ revenue: 0, studentsCount: 0, coursesCount: 0, certsCount: 0, ordersCount: 0, batchesCount: 0, liveSessionsCount: 0 });
+  const [metrics, setMetrics] = useState({ revenue: 0, studentsCount: 0, coursesCount: 0, certsCount: 0, ordersCount: 0, batchesCount: 0, liveSessionsCount: 0, adminsCount: 0 });
   const [loading, setLoading] = useState(true);
+
+  // New Admin Form State
+  const [newAdminForm, setNewAdminForm] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    password: '',
+  });
+
+  // Change Password Form State
+  const [passwordForm, setPasswordForm] = useState({
+    adminEmail: '',
+    newPassword: '',
+    confirmPassword: '',
+  });
 
   // Authentication Protection: Require admin login
   useEffect(() => {
@@ -208,6 +237,7 @@ export default function AdminPage() {
         setCourses(d.courses || []);
         setCertificates(d.certificates || []);
         setStudents(d.students || []);
+        setAdmins(d.admins || []);
         setOrders(d.orders || []);
         setOfflineBatches(d.offlineBatches || []);
         setLiveSessions(d.liveSessions || []);
@@ -219,6 +249,7 @@ export default function AdminPage() {
           ordersCount: d.orders?.length || 0,
           batchesCount: d.offlineBatches?.length || 0,
           liveSessionsCount: d.liveSessions?.length || 0,
+          adminsCount: d.admins?.length || 0,
         });
       }
     } catch (err) {
@@ -523,6 +554,103 @@ export default function AdminPage() {
     }
   };
 
+  // Create New Admin Handler
+  const handleCreateAdmin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newAdminForm.name || !newAdminForm.email || !newAdminForm.password) {
+      return alert('Name, Email and Password are required');
+    }
+    if (newAdminForm.password.length < 6) {
+      return alert('Password must be at least 6 characters long');
+    }
+
+    try {
+      const res = await fetch('/api/admin/manage', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'create_admin',
+          ...newAdminForm,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        alert('New Administrator created and registered in database successfully!');
+        setNewAdminForm({ name: '', email: '', phone: '', password: '' });
+        fetchData();
+      } else {
+        alert(data.error || 'Failed to create administrator');
+      }
+    } catch {
+      alert('Error connecting to server to create admin');
+    }
+  };
+
+  // Delete Admin Handler
+  const handleDeleteAdmin = async (adminId: string, adminEmail: string) => {
+    if (admins.length <= 1) {
+      return alert('Cannot delete the last remaining administrator account.');
+    }
+    if (!confirm(`Are you sure you want to revoke admin privileges for ${adminEmail}?`)) return;
+
+    try {
+      const res = await fetch('/api/admin/manage', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'delete_admin',
+          adminId,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        alert('Administrator removed successfully.');
+        fetchData();
+      } else {
+        alert(data.error || 'Failed to remove administrator');
+      }
+    } catch {
+      alert('Error removing administrator');
+    }
+  };
+
+  // Change Admin Password Handler
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const targetEmail = passwordForm.adminEmail || user?.email || 'admin@learnfxtrade.com';
+
+    if (!passwordForm.newPassword) {
+      return alert('New password cannot be empty');
+    }
+    if (passwordForm.newPassword.length < 6) {
+      return alert('Password must be at least 6 characters');
+    }
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      return alert('New password and confirm password do not match');
+    }
+
+    try {
+      const res = await fetch('/api/admin/manage', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'change_admin_password',
+          email: targetEmail,
+          newPassword: passwordForm.newPassword,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        alert(`Password for ${targetEmail} updated in database successfully!`);
+        setPasswordForm({ adminEmail: '', newPassword: '', confirmPassword: '' });
+      } else {
+        alert(data.error || 'Failed to update password');
+      }
+    } catch {
+      alert('Error updating password in database');
+    }
+  };
+
   const totalOfflineAttendees = offlineBatches.reduce(
     (acc, b) => acc + (b.enrolledStudents ? b.enrolledStudents.length : b.bookedSeats),
     0
@@ -543,6 +671,8 @@ export default function AdminPage() {
     { key: 'certificates', label: 'Certificates', icon: Award, count: certificates.length },
     { key: 'students', label: 'Students Access', icon: Users, count: students.length },
     { key: 'orders', label: 'Orders & Payments', icon: CreditCard, count: orders.length },
+    { key: 'admins', label: 'Manage Admins', icon: UserPlus, count: admins.length },
+    { key: 'settings', label: 'Change Password', icon: Key, count: null },
   ];
 
 
@@ -649,6 +779,8 @@ export default function AdminPage() {
               {activeTab === 'certificates' && 'Manage Payout Certificates'}
               {activeTab === 'students' && 'Manage Student Access'}
               {activeTab === 'orders' && 'Orders & Payments'}
+              {activeTab === 'admins' && 'Manage Administrators'}
+              {activeTab === 'settings' && 'Change Admin Password'}
             </h1>
           </div>
 
@@ -2263,6 +2395,258 @@ export default function AdminPage() {
                     </tbody>
                   </table>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB: MANAGE ADMINS */}
+          {activeTab === 'admins' && (
+            <div className="space-y-8">
+              {/* Add New Admin Form */}
+              <div className="rounded-2xl border border-[#222222] bg-[#111111] p-6 space-y-6">
+                <div className="flex items-center gap-3 border-b border-[#222222] pb-4">
+                  <div className="p-2.5 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                    <UserPlus className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h2 className="text-base font-bold text-white">Create New Administrator</h2>
+                    <p className="text-xs text-[#a1a1aa]">
+                      Add trusted team members or mentors with full administrative privileges. Credentials are saved directly to the database.
+                    </p>
+                  </div>
+                </div>
+
+                <form onSubmit={handleCreateAdmin} className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-white uppercase tracking-wider">
+                        Full Name <span className="text-red-400">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={newAdminForm.name}
+                        onChange={(e) => setNewAdminForm({ ...newAdminForm, name: e.target.value })}
+                        placeholder="e.g. Rahul Sharma"
+                        className="w-full px-4 py-2.5 rounded-xl bg-[#0a0a0a] border border-[#2a2a2a] text-xs text-white focus:outline-none focus:border-purple-500 transition"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-white uppercase tracking-wider">
+                        Email Address <span className="text-red-400">*</span>
+                      </label>
+                      <input
+                        type="email"
+                        required
+                        value={newAdminForm.email}
+                        onChange={(e) => setNewAdminForm({ ...newAdminForm, email: e.target.value })}
+                        placeholder="e.g. rahul@learnfxtrade.com"
+                        className="w-full px-4 py-2.5 rounded-xl bg-[#0a0a0a] border border-[#2a2a2a] text-xs text-white focus:outline-none focus:border-purple-500 transition"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-white uppercase tracking-wider">
+                        Phone Number (Optional)
+                      </label>
+                      <input
+                        type="tel"
+                        value={newAdminForm.phone}
+                        onChange={(e) => setNewAdminForm({ ...newAdminForm, phone: e.target.value })}
+                        placeholder="+91 9876543210"
+                        className="w-full px-4 py-2.5 rounded-xl bg-[#0a0a0a] border border-[#2a2a2a] text-xs text-white focus:outline-none focus:border-purple-500 transition"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-white uppercase tracking-wider">
+                        Admin Password <span className="text-red-400">*</span>
+                      </label>
+                      <input
+                        type="password"
+                        required
+                        minLength={6}
+                        value={newAdminForm.password}
+                        onChange={(e) => setNewAdminForm({ ...newAdminForm, password: e.target.value })}
+                        placeholder="Minimum 6 characters"
+                        className="w-full px-4 py-2.5 rounded-xl bg-[#0a0a0a] border border-[#2a2a2a] text-xs text-white focus:outline-none focus:border-purple-500 transition font-mono"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end pt-2">
+                    <button
+                      type="submit"
+                      className="px-6 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs flex items-center gap-2 transition shadow-lg shadow-purple-600/20 cursor-pointer"
+                    >
+                      <UserPlus className="h-4 w-4" />
+                      <span>Save & Authorize Admin</span>
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+              {/* Existing Admins Roster */}
+              <div className="rounded-2xl border border-[#222222] bg-[#111111] p-6 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-base font-bold text-white">Authorized Administrators Roster</h3>
+                    <p className="text-xs text-[#a1a1aa]">
+                      Users listed here have full root access to course management, student enrollments, batches, and certificates.
+                    </p>
+                  </div>
+                  <span className="px-3 py-1 rounded-full text-xs font-bold bg-purple-500/10 text-purple-400 border border-purple-500/20 font-mono">
+                    {admins.length} {admins.length === 1 ? 'Admin' : 'Admins'} Registered
+                  </span>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead className="border-b border-[#222222] text-[#a1a1aa] uppercase text-[10px]">
+                      <tr>
+                        <th className="py-3 px-3">Administrator</th>
+                        <th className="py-3 px-3">Email Address</th>
+                        <th className="py-3 px-3">Phone</th>
+                        <th className="py-3 px-3">Role</th>
+                        <th className="py-3 px-3">Created</th>
+                        <th className="py-3 px-3 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[#222222]">
+                      {admins.map((adm) => {
+                        const isSelf = adm.email.toLowerCase() === user?.email?.toLowerCase();
+                        return (
+                          <tr key={adm.id} className="hover:bg-[#181818] transition">
+                            <td className="py-3 px-3">
+                              <div className="flex items-center gap-2.5">
+                                <div className="w-7 h-7 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 flex items-center justify-center font-bold text-xs">
+                                  {adm.name.charAt(0).toUpperCase()}
+                                </div>
+                                <div>
+                                  <span className="font-bold text-white block">{adm.name}</span>
+                                  {isSelf && (
+                                    <span className="text-[10px] text-[#10b981] font-semibold">
+                                      (Current logged-in session)
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            </td>
+                            <td className="py-3 px-3 font-mono text-[#a1a1aa]">{adm.email}</td>
+                            <td className="py-3 px-3 font-mono text-[#a1a1aa]">{adm.phone || '—'}</td>
+                            <td className="py-3 px-3">
+                              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-500/20 text-purple-400 border border-purple-500/30">
+                                {adm.role}
+                              </span>
+                            </td>
+                            <td className="py-3 px-3 text-[#a1a1aa]">
+                              {adm.createdAt ? new Date(adm.createdAt).toLocaleDateString() : 'Active'}
+                            </td>
+                            <td className="py-3 px-3 text-right">
+                              <button
+                                onClick={() => handleDeleteAdmin(adm.id, adm.email)}
+                                disabled={isSelf || admins.length <= 1}
+                                title={isSelf ? 'Cannot delete yourself' : 'Revoke Admin Access'}
+                                className={`p-2 rounded-lg transition ${
+                                  isSelf || admins.length <= 1
+                                    ? 'opacity-30 cursor-not-allowed text-[#71717a]'
+                                    : 'hover:bg-red-500/10 text-[#71717a] hover:text-red-400 cursor-pointer'
+                                }`}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB: CHANGE ADMIN PASSWORD */}
+          {activeTab === 'settings' && (
+            <div className="max-w-2xl space-y-6">
+              <div className="rounded-2xl border border-[#222222] bg-[#111111] p-6 sm:p-8 space-y-6">
+                <div className="flex items-center gap-3 border-b border-[#222222] pb-5">
+                  <div className="p-3 rounded-2xl bg-[#10b981]/10 text-[#10b981] border border-[#10b981]/20">
+                    <Key className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-bold text-white">Change Admin Password</h2>
+                    <p className="text-xs text-[#a1a1aa] mt-0.5">
+                      Update your administrator password in the live database. Changes take effect immediately.
+                    </p>
+                  </div>
+                </div>
+
+                <form onSubmit={handleChangePassword} className="space-y-5">
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-white uppercase tracking-wider">
+                      Select Administrator Account
+                    </label>
+                    <select
+                      value={passwordForm.adminEmail || user?.email || ''}
+                      onChange={(e) => setPasswordForm({ ...passwordForm, adminEmail: e.target.value })}
+                      className="w-full px-4 py-2.5 rounded-xl bg-[#0a0a0a] border border-[#2a2a2a] text-xs text-white focus:outline-none focus:border-[#10b981] transition font-mono"
+                    >
+                      {admins.length > 0 ? (
+                        admins.map((adm) => (
+                          <option key={adm.id} value={adm.email}>
+                            {adm.name} ({adm.email}) {adm.email.toLowerCase() === user?.email?.toLowerCase() ? '— Current' : ''}
+                          </option>
+                        ))
+                      ) : (
+                        <option value={user?.email || 'admin@learnfxtrade.com'}>
+                          {user?.email || 'admin@learnfxtrade.com'}
+                        </option>
+                      )}
+                    </select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-white uppercase tracking-wider">
+                      New Password <span className="text-red-400">*</span>
+                    </label>
+                    <input
+                      type="password"
+                      required
+                      minLength={6}
+                      value={passwordForm.newPassword}
+                      onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+                      placeholder="Enter new strong password (min 6 characters)"
+                      className="w-full px-4 py-2.5 rounded-xl bg-[#0a0a0a] border border-[#2a2a2a] text-xs text-white focus:outline-none focus:border-[#10b981] transition font-mono"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-white uppercase tracking-wider">
+                      Confirm New Password <span className="text-red-400">*</span>
+                    </label>
+                    <input
+                      type="password"
+                      required
+                      minLength={6}
+                      value={passwordForm.confirmPassword}
+                      onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
+                      placeholder="Re-enter new password"
+                      className="w-full px-4 py-2.5 rounded-xl bg-[#0a0a0a] border border-[#2a2a2a] text-xs text-white focus:outline-none focus:border-[#10b981] transition font-mono"
+                    />
+                  </div>
+
+                  <div className="pt-2">
+                    <button
+                      type="submit"
+                      className="w-full sm:w-auto px-6 py-3 rounded-xl bg-[#10b981] hover:bg-[#059669] text-black font-extrabold text-xs flex items-center justify-center gap-2 transition shadow-lg shadow-[#10b981]/20 cursor-pointer"
+                    >
+                      <Lock className="h-4 w-4" />
+                      <span>Update & Save Password</span>
+                    </button>
+                  </div>
+                </form>
               </div>
             </div>
           )}
