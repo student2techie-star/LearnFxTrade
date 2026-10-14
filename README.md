@@ -78,3 +78,23 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 - **Student Account**: `student@example.com` (password: `password123`) — Has instant access to enrolled Forex Mastery course.
 - **Admin Account**: `admin@learnfxtrade.com` (password: `password123`) — Full access to the `/admin` portal and all syllabuses.
+
+---
+
+## 🌐 Deploy to Vercel (Recommended)
+
+This full-stack Next.js application is optimized for deployment on [Vercel](https://vercel.com):
+
+1. **Push your code to GitHub** (already connected to `student2techie-star/LearnFxTrade`).
+2. Go to [Vercel Dashboard](https://vercel.com/new) and click **"Add New Project"**.
+3. Import your **`LearnFxTrade`** GitHub repository.
+4. Set the **Framework Preset** to **Next.js** (detected automatically).
+5. Add the **Environment Variables** (from `.env.example`):
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `SUPABASE_SERVICE_ROLE_KEY`
+   - `NEXT_PUBLIC_RAZORPAY_KEY_ID`
+   - `RAZORPAY_KEY_SECRET`
+   - `RAZORPAY_WEBHOOK_SECRET`
+   - `NEXT_PUBLIC_APP_URL` (set to your Vercel production domain, e.g. `https://learnfxtrade.vercel.app`)
+6. Click **Deploy**. Vercel will build and deploy your application with serverless support for all API routes and Razorpay webhooks.
